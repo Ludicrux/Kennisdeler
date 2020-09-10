@@ -1,5 +1,6 @@
 from django.db import models
-from django.conf import settings
+from django.contrib.auth.models import User
+
 
 from django_extensions.db.models import TimeStampedModel
 
@@ -12,12 +13,12 @@ class Article(TimeStampedModel):
     Model for the user uploaded articles
     """
     title = models.CharField(max_length=120)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     short_desc = CharField(max_length=120)
     long_desc = models.TextField(max_length=1500, null=True, blank=True)
     image = models.ImageField()
     uploaded_file = models.FileField(upload_to='')
-    user_likes = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    user_likes = models.ManyToManyField(User)
     subject = models.CharField(max_length=25)
     level = models.CharField(max_length=25)
     tags = models.ManyToManyField(Tag)
