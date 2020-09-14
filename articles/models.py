@@ -39,6 +39,7 @@ def article_file_path(instance, filename):
 
     return os.path.join('files/article-files/', filename)
 
+
 def article_image_path(instance, filename):
     """Generate file path for uploaded image"""
     ext = filename.split('.')[-1]
@@ -74,4 +75,3 @@ class Article(TimeStampedModel):
     is_public = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
     downloads = models.ManyToManyField(User, blank=True)
-    
