@@ -31,19 +31,20 @@ FILE_TYPE_CHOICES = [
     ('NVT', 'N.v.t.'),
 ]
 
+
 def article_file_path(instance, filename):
     """Generate file path for uploaded file"""
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
 
-    return os.path.join('files/article-files/', filename) 
+    return os.path.join('files/article-files/', filename)
 
 def article_image_path(instance, filename):
     """Generate file path for uploaded image"""
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
 
-    return os.path.join('images/article-images/', filename) 
+    return os.path.join('images/article-images/', filename)
 
 
 class Tag(TimeStampedModel):
@@ -55,7 +56,7 @@ class Article(TimeStampedModel):
     """Model for the user uploaded articles"""
     title = models.CharField(max_length=120)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    short_desc = CharField(max_length=120)
+    short_desc = models.CharField(max_length=120)
     long_desc = models.TextField(max_length=1500, blank=True)
     image = models.ImageField(upload_to=article_image_path)
     uploaded_file = models.FileField(upload_to=article_file_path)
@@ -73,3 +74,4 @@ class Article(TimeStampedModel):
     is_public = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
     downloads = models.ManyToManyField(User, blank=True)
+    
