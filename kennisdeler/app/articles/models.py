@@ -1,6 +1,3 @@
-import uuid
-import os
-
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -63,12 +60,9 @@ class Article(TimeStampedModel):
     views = models.IntegerField(default=0)
     downloads = models.ManyToManyField(User, blank=True)
 
-
     class Meta:
         verbose_name = "Artikel"
         verbose_name_plural = "Artikelen"
 
-
     def __str__(self):
         return self.title
-    
