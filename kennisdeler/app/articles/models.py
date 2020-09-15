@@ -50,7 +50,7 @@ class Article(TimeStampedModel):
         max_length=3, choices=SUBJECT_CHOICES, default='ASF'
     )
     level = models.IntegerField(
-        choices=LEVEL_CHOICES, default='1'
+        choices=LEVEL_CHOICES, default=1
     )
     tags = models.ManyToManyField(Tag, blank=True)
     file_type = models.CharField(
