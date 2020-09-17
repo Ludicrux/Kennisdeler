@@ -51,7 +51,9 @@ class Article(TimeStampedModel):
     long_desc = models.TextField(max_length=1500, blank=True)
     image = models.ImageField(upload_to="images/article-images/")
     uploaded_file = models.FileField(upload_to="documents/article-documents/")
-    user_likes = models.ManyToManyField(User, blank=True, related_name="user_likes")
+    user_likes = models.ManyToManyField(
+        User, blank=True, related_name="user_likes"
+    )
     subject = models.CharField(
         max_length=3, choices=SUBJECT_CHOICES, default="ASF"
     )
@@ -64,7 +66,9 @@ class Article(TimeStampedModel):
     )
     is_public = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
-    downloads = models.ManyToManyField(User, blank=True, related_name="user_downloads")
+    downloads = models.ManyToManyField(
+        User, blank=True, related_name="user_downloads"
+    )
 
     class Meta:
         verbose_name = "Artikel"
