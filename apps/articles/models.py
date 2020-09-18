@@ -52,7 +52,7 @@ class Article(TimeStampedModel):
     image = models.ImageField(upload_to="images/article-images/")
     uploaded_file = models.FileField(upload_to="documents/article-documents/")
     user_likes = models.ManyToManyField(
-        User, blank=True ,null=True, related_name="user_likes"
+        User, blank=True, null=True, related_name="user_likes"
     )
     subject = models.CharField(
         max_length=3, choices=SUBJECT_CHOICES, default="ASF"
