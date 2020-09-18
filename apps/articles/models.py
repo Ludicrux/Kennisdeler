@@ -39,7 +39,7 @@ class Tag(TimeStampedModel):
     name = models.CharField(max_length=25, unique=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}"
 
 
 class Article(TimeStampedModel):
@@ -75,7 +75,7 @@ class Article(TimeStampedModel):
         verbose_name_plural = "Artikelen"
 
     def __str__(self):
-        return self.title
+        return f"{self.title}"
 
     def get_absolute_url(self):
         return reverse("articlepage", args=[self.slug])
