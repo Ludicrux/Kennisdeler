@@ -79,3 +79,8 @@ class Article(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse("articlepage", args=[self.slug])
+
+    def save(self, *args, **kwargs):
+        """Slugify the title and save it""" 
+        self.slug = slugify(self.title) 
+        super(Article, self).save(*args, **kwargs)
