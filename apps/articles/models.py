@@ -48,11 +48,11 @@ class Article(TimeStampedModel):
     slug = models.SlugField(max_length=30)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     short_desc = models.CharField(max_length=120)
-    long_desc = models.TextField(max_length=1500, blank=True)
+    long_desc = models.TextField(max_length=1500, blank=True, null=True)
     image = models.ImageField(upload_to="images/article-images/")
     uploaded_file = models.FileField(upload_to="documents/article-documents/")
     user_likes = models.ManyToManyField(
-        User, blank=True, related_name="user_likes"
+        User, blank=True ,null=True, related_name="user_likes"
     )
     subject = models.CharField(
         max_length=3, choices=SUBJECT_CHOICES, default="ASF"
@@ -60,14 +60,14 @@ class Article(TimeStampedModel):
     level = models.IntegerField(
         choices=LEVEL_CHOICES, default=1
     )
-    tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, null=True)
     file_type = models.CharField(
         max_length=3, choices=FILE_TYPE_CHOICES, default="3DB"
     )
     is_public = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
     downloads = models.ManyToManyField(
-        User, blank=True, related_name="user_downloads"
+        User, blank=True, null=True, related_name="user_downloads"
     )
 
     class Meta:
