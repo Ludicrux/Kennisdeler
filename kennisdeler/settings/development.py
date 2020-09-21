@@ -22,14 +22,11 @@ sys.path.append(str(APPS_DIR))
 env = environ.Env(
     DEBUG=(bool, False)
 )
-
 env.read_env(str(ROOT_DIR.path(".env")))
-
 
 DEBUG = env('DEBUG')
 
 SECRET_KEY = env('SECRET_KEY')
-
 
 DATABASES = {
     "default": {
