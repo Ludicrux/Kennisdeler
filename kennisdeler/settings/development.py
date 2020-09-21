@@ -11,25 +11,41 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import sys
 
 import environ
+import psycopg2
 
 
+ROOT_DIR = environ.Path(__file__) - 3
+APPS_DIR = ROOT_DIR.path("apps")
+sys.path.append(str(APPS_DIR))
 env = environ.Env(
-
     DEBUG=(bool, False)
 )
 
-environ.Env.read_env()
+env.read_env(str(ROOT_DIR.path(".env")))
 
 
 DEBUG = env('DEBUG')
 
 SECRET_KEY = env('SECRET_KEY')
 
-DATABASE = {
-    'default': env.db()
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": env("DATABASE_NAME"),
+        "USER": env("DATABASE_USER"),
+        "PASSWORD": env("DATABASE_PASSWORD"),
+        "HOST": env("DATABASE_HOST"),
+        "PORT": env("DATABASE_PORT"),
+        "ATOMIC_REQUESTS": True,
+        # Lower CONN_MAX_AGE if postgres "too many connections" errors.
+        "CONN_MAX_AGE": 60,
+    }
 }
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
