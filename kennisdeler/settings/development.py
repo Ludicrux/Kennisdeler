@@ -14,7 +14,6 @@ import os
 import sys
 
 import environ
-import psycopg2
 
 
 ROOT_DIR = environ.Path(__file__) - 3

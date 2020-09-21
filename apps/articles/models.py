@@ -5,7 +5,7 @@ Models for user uploaded articles
 from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
-from django.utils.text import slugify  
+from django.utils.text import slugify
 
 from django_extensions.db.models import TimeStampedModel
 
@@ -82,6 +82,6 @@ class Article(TimeStampedModel):
         return reverse("articlepage", args=[self.slug])
 
     def save(self, *args, **kwargs):
-        """Slugify the title and save it""" 
-        self.slug = slugify(self.title) 
+        """Slugify the title and save it"""
+        self.slug = slugify(self.title)
         super(Article, self).save(*args, **kwargs)
