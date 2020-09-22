@@ -1,0 +1,35 @@
+{% block content %}
+    <h1>{{ article.title }}</h1>
+    <ul>
+        <li>{{ article.short_desc }}</li>
+        <li>{{ article.CreationDateTimeField|date }}</li>
+    </ul>
+    File here
+    <ul>
+        <li>
+            {{ article.subject }}
+            {% for tags in article.tags %}
+                {{ tag }}
+            {% endfor %}
+        </li>
+    </ul>
+    <ul>
+        <li>{{ article.author }}</li>
+        <li>{{ article.views}}X bekeken / {{ article.downloads }}X gedownload</li>
+    </ul>
+    <ul>
+        <li>DOWNLOADEN     DELEN</li>
+        <li>Opslaan als favoriet</li>
+        <li>Like</li>
+    </ul>
+    <ul>
+        <li>STUUR EEN PERSOONLIJK BEDANKJE</li>
+        <li>MESSAGE FIELD</li>
+        <li>VERSTUUR</li>
+    </ul>
+    <ul>
+        <li>Hier is iets niet in orde</li>
+    </ul>
+    VERGELIJKBAAR
+
+{% endblock %}

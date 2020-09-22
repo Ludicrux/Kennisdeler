@@ -70,9 +70,7 @@ class Article(TimeStampedModel):
     )
     is_public = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
-    downloads = models.ManyToManyField(
-        User, blank=True, related_name="user_downloads"
-    )
+    downloads = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Artikel"
