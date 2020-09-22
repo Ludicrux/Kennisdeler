@@ -9,13 +9,7 @@ from django.utils.text import slugify
 
 from django_extensions.db.models import TimeStampedModel
 
-
-SUBJECT_CHOICES = [
-    ("ASF", "Asfalt"),
-    ("AST", "Assistent"),
-    ("BES", "Bestratingen"),
-    ("BET", "Betonboren"),
-]
+DEFAULT_SUBJECT_ID = 1
 
 LEVEL_CHOICES = [
     (1, "Niveau 1"),
@@ -33,6 +27,15 @@ FILE_TYPE_CHOICES = [
     ("TOE", "Toets"),
     ("NVT", "N.v.t."),
 ]
+
+
+class Subject(TimeStampedModel):
+    """Subjects used for the article"""
+    name = models.CharField(max_length=25, unique=True)
+    image = models.ImageField(upload_to="images/subject-images/")
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Tag(TimeStampedModel):
@@ -55,8 +58,8 @@ class Article(TimeStampedModel):
     user_likes = models.ManyToManyField(
         User, blank=True, related_name="user_likes"
     )
-    subject = models.CharField(
-        max_length=3, choices=SUBJECT_CHOICES, default="ASF"
+    subject = models.ForeignKey(
+        Subject, default=DEFAULT_SUBJECT_ID, on_delete=models.SET_DEFAULT
     )
     level = models.IntegerField(
         choices=LEVEL_CHOICES, default=1
