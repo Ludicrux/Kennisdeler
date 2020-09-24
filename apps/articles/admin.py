@@ -1,3 +1,7 @@
-# from django.contrib import admin
+from django.contrib import admin
+from .models import Subject, Tag, Article
 
-# Register your models here.
+
+admin.site.register(Subject)
+admin.site.register(Tag)
+admin.site.register(Article)

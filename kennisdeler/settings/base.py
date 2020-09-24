@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-import os
 import sys
 
 import environ
@@ -19,8 +18,8 @@ from pathlib import Path
 
 
 ROOT_DIR = environ.Path(__file__) - 3
-APPS_DIR = ROOT_DIR.path("apps")
-sys.path.append(str(APPS_DIR))
+ENVAPPS_DIR = ROOT_DIR.path("apps")
+sys.path.append(str(ENVAPPS_DIR))
 env = environ.Env(
     DEBUG=(bool, False)
 )
@@ -29,6 +28,7 @@ env.read_env(str(ROOT_DIR.path(".env")))
 DEBUG = env('DEBUG')
 
 SECRET_KEY = env('SECRET_KEY')
+
 
 DATABASES = {
     "default": {
@@ -46,8 +46,8 @@ DATABASES = {
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+APPS_DIR = Path(BASE_DIR).joinpath('apps')
 
 ALLOWED_HOSTS = []
 
@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'articles',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -75,7 +76,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = 'kennisdeler.urls'
 
 TEMPLATES = [
     {
@@ -130,6 +131,25 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = Path(BASE_DIR).joinpath('media')
 MEDIA_URL = '/media/'
 
-TEMPLATE_DIR = '/templates/'
+
+CONTEXT_PROCESSORS = [
+    "django.contrib.auth.context_processors.auth",
+    "django.contrib.messages.context_processors.messages",
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [APPS_DIR / 'templates'],
+        "OPTIONS": {
+            "context_processors": CONTEXT_PROCESSORS,
+            "loaders": [
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ]
+        },
+    },
+]

@@ -1,35 +1,32 @@
 {% block content %}
     <h1>{{ article.title }}</h1>
-    <ul>
-        <li>{{ article.short_desc }}</li>
-        <li>{{ article.CreationDateTimeField|date }}</li>
-    </ul>
+    <div>
+        {{ article.short_desc }}
+        {{ article.CreationDateTimeField|date }}
+    </div>
     File here
-    <ul>
-        <li>
+    <div>
+        
             {{ article.subject }}
-            {% for tags in article.tags %}
-                {{ tag }}
-            {% endfor %}
-        </li>
-    </ul>
-    <ul>
-        <li>{{ article.author }}</li>
-        <li>{{ article.views}}X bekeken / {{ article.downloads }}X gedownload</li>
-    </ul>
-    <ul>
-        <li>DOWNLOADEN     DELEN</li>
-        <li>Opslaan als favoriet</li>
-        <li>Like</li>
-    </ul>
-    <ul>
-        <li>STUUR EEN PERSOONLIJK BEDANKJE</li>
-        <li>MESSAGE FIELD</li>
-        <li>VERSTUUR</li>
-    </ul>
-    <ul>
-        <li>Hier is iets niet in orde</li>
-    </ul>
+        
+    </div>
+    <div>
+        {{ article.author }}
+        {{ article.views}}X bekeken / {{ article.downloads }}X gedownload
+    </div>
+    <div>
+        DOWNLOADEN     DELEN
+        Opslaan als favoriet
+        Like
+    </div>
+    <div>
+        STUUR EEN PERSOONLIJK BEDANKJE
+        MESSAGE FIELD
+        VERSTUUR
+    </div>
+    <div>
+        Hier is iets niet in orde
+    </div>
     VERGELIJKBAAR
 
 {% endblock %}

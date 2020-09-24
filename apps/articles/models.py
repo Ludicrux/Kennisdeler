@@ -9,8 +9,6 @@ from django.utils.text import slugify
 
 from django_extensions.db.models import TimeStampedModel
 
-DEFAULT_SUBJECT_ID = 1
-
 LEVEL_CHOICES = [
     (1, "Niveau 1"),
     (2, "Niveau 2"),
@@ -59,7 +57,7 @@ class Article(TimeStampedModel):
         User, blank=True, related_name="user_likes"
     )
     subject = models.ForeignKey(
-        Subject, default=DEFAULT_SUBJECT_ID, on_delete=models.SET_DEFAULT
+        Subject, null=True, on_delete=models.SET_NULL
     )
     level = models.IntegerField(
         choices=LEVEL_CHOICES, default=1
@@ -80,7 +78,7 @@ class Article(TimeStampedModel):
         return f"{self.title}"
 
     def get_absolute_url(self):
-        return reverse("articlepage", args=[self.slug])
+        return reverse("articlepage", kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
         """Slugify the title and save it"""

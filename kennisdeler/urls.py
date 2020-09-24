@@ -4,7 +4,7 @@ Core URL patterns
 from django.contrib import admin
 from django.urls import include, path
 
-from . import views
+from core import views
 
 
 urlpatterns = [
