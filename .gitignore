@@ -1,1 +1,9 @@
-.env, .DS_Store, .vscode
+.env
+.DS_Store
+.vscode
+
+### Django ###
+*.pyc
+__pycache__/
+
+media
