@@ -1,7 +1,7 @@
 stages:
   - test
 before_script:
-  - pip install -r requirements.txt
+  - pip install -r requirements/base.txt
 flake8:
   stage: test
   allow_failure: true
