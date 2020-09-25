@@ -54,7 +54,7 @@ class Article(TimeStampedModel):
     image = models.ImageField(upload_to="images/article-images/")
     uploaded_file = models.FileField(upload_to="documents/article-documents/")
     user_likes = models.ManyToManyField(
-        User, blank=True, through="Likes", related_name="user_likes"
+        User, blank=True, through="Like", related_name="user_likes"
     )
     subject = models.ForeignKey(
         Subject, null=True, on_delete=models.SET_NULL
