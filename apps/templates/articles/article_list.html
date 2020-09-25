@@ -1,6 +1,6 @@
 <h1>Kennisbank</h1>
 {% block content %}
     {% for article in object_list %}
-        {{ article.title }}
+        {{ article.title }} {{ article.like_amount }}<br>
     {% endfor %}
 {% endblock %}

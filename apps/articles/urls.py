@@ -6,7 +6,11 @@ from . import views
 
 app_name = "articles"
 urlpatterns = [
-    path("<slug:slug>", views.ArticleListView.as_view(), name="article_list"),
+    path(
+        '<order_by>/',
+        views.ArticleListView.as_view(),
+        name="article_list_new"
+        ),
     path(
         "<slug:slug>/",
         views.ArticleDetailView.as_view(),

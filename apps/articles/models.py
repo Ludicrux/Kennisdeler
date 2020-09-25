@@ -90,3 +90,6 @@ class Like(TimeStampedModel):
     """Model to filter the article by popularity"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.created}"
