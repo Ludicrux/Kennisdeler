@@ -22,7 +22,7 @@ class ArticleListView(ListView):
             ).order_by("-num_likes")
 
         elif self.kwargs["order_by"] == "hot":
-            """Order by most likes all time"""
+            """Order by most likes over the last week"""
             last_week = date.today() - timedelta(days=1)
             return Article.objects.annotate(
                 num_likes=Count("user_likes", filter=Q(created__gte=last_week))
