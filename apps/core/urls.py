@@ -1,7 +1,7 @@
 """URL routing to Articles"""
-from django.urls import path
+# from django.urls import path
 
-from . import views
+# from . import views
 
 
 app_name = "core"

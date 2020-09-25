@@ -7,8 +7,7 @@ class ArticleListView(ListView):
     model = Article
     template_name = "articles/article_list.html"
 
-#    def get_queryset(self):
-#        if
+
 class ArticleDetailView(DetailView):
     model = Article
     context_object_name = "article"
