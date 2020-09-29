@@ -54,7 +54,7 @@ class Article(TimeStampedModel):
     image = models.ImageField(upload_to="images/article-images/")
     uploaded_file = models.FileField(upload_to="documents/article-documents/")
     user_likes = models.ManyToManyField(
-        User, blank=True, related_name="user_likes"
+        User, blank=True, through="Like", related_name="user_likes"
     )
     subject = models.ForeignKey(
         Subject, null=True, on_delete=models.SET_NULL
@@ -84,3 +84,9 @@ class Article(TimeStampedModel):
         """Slugify the title and save it"""
         self.slug = slugify(self.title)
         super(Article, self).save(*args, **kwargs)
+
+
+class Like(TimeStampedModel):
+    """Model to filter the article by popularity"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)

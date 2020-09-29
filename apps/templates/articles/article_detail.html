@@ -1,8 +1,8 @@
 {% block content %}
     <h1>{{ article.title }}</h1>
     <div>
-        {{ article.short_desc }}
-        {{ article.CreationDateTimeField|date }}
+        {{ article.short_desc }} <br>
+        {{ article.created|date }}
     </div>
     File here
     <div>
