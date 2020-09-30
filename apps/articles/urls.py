@@ -7,13 +7,13 @@ from . import views
 app_name = "articles"
 urlpatterns = [
     path(
+        "kennis/<slug:slug>/",
+        views.ArticleDetailView.as_view(),
+        name="article-detail"
+    ),
+    path(
         '<order_by>/',
         views.ArticleListView.as_view(),
-        name="article_list_new"
+        name="article-list"
         ),
-    path(
-        "<slug:slug>/",
-        views.ArticleDetailView.as_view(),
-        name="article_detail"
-    ),
 ]
