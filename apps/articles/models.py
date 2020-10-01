@@ -9,6 +9,7 @@ from django.utils.text import slugify
 
 from django_extensions.db.models import TimeStampedModel
 
+
 LEVEL_CHOICES = [
     (1, "Niveau 1"),
     (2, "Niveau 2"),
