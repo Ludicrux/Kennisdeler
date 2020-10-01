@@ -1,6 +1,7 @@
 Django==2.2.16
 django-extensions==3.0.8
 flake8==3.8.3
+pylint==2.6.0
 django-environ==0.4.5
 Pillow==7.2.0
 psycopg2==2.8.6
