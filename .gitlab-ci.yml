@@ -8,7 +8,7 @@ flake8:
   stage: test
   allow_failure: true
   script:
-    - flake8
+    - time flake8
 
 pylint:
   stage: test
