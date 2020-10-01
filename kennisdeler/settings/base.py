@@ -11,10 +11,9 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import sys
+from pathlib import Path
 
 import environ
-
-from pathlib import Path
 
 
 ROOT_DIR = environ.Path(__file__) - 3
@@ -78,7 +77,7 @@ ROOT_URLCONF = 'kennisdeler.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [Path(BASE_DIR).joinpath('templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,7 +130,7 @@ STATICFILES_DIRS = [
 ]
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = (BASE_DIR)
+MEDIA_ROOT = Path(BASE_DIR).joinpath('media')
 MEDIA_URL = '/media/'
 
 
@@ -153,3 +152,5 @@ TEMPLATES = [
         },
     },
 ]
+
+LOGIN_REDIRECT_URL = '/kennisbank/'

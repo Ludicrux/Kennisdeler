@@ -1,4 +1,6 @@
-"""URL routing to Articles"""
+"""
+URL routing to Articles
+"""
 from django.urls import path
 
 from . import views

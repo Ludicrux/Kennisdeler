@@ -45,6 +45,7 @@ class Tag(TimeStampedModel):
         return f"{self.name}"
 
 
+# WIP  slug = AutoSlugField(populate_from=['title'])
 class Article(TimeStampedModel):
     """Model for the user uploaded articles"""
     title = models.CharField(max_length=120)
@@ -52,8 +53,14 @@ class Article(TimeStampedModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     short_desc = models.CharField(max_length=120)
     long_desc = models.TextField(max_length=1500, blank=True)
-    image = models.ImageField(upload_to="images/article-images/")
-    uploaded_file = models.FileField(upload_to="documents/article-documents/")
+    image = models.ImageField(
+        upload_to="images/article-images",
+        verbose_name="articleimg"
+    )
+    uploaded_file = models.FileField(
+        upload_to="documents/article-documents",
+        verbose_name="articledoc"
+    )
     user_likes = models.ManyToManyField(
         User, blank=True, through="Like", related_name="user_likes"
     )
