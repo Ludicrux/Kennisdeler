@@ -2,9 +2,11 @@
 
 {% if user.is_authenticated %}
     <li>logged in as: {{ user.get_username }}</li>
-    <li><a href="{% url 'logout' %}"">Logout</a></li>
+    <li><a href="{% url 'logout' %}">Logout</a></li><br>
+    <a href="{% url 'articles:article-create' %}">Nieuwe kennis toevoegen</a> <br>
+    <a href="{% url 'articles:article-list' 'nieuw' %}">KennisBank</a>
 {% else %}
-    <li><a href="{% url 'login' %}"">Login</a></li>
+    <li><a href="{% url 'login' %}">Login</a></li>
 {% endif %}
 
 {% endblock %}

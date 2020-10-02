@@ -5,9 +5,9 @@ Models for user uploaded articles
 from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
-from django.utils.text import slugify
 
 from django_extensions.db.models import TimeStampedModel
+from django_extensions.db.fields import AutoSlugField
 
 
 LEVEL_CHOICES = [
@@ -38,18 +38,17 @@ class Subject(TimeStampedModel):
 
 
 class Tag(TimeStampedModel):
-    """tags used for article"""
+    """Tags used for article"""
     name = models.CharField(max_length=25, unique=True)
 
     def __str__(self):
         return f"{self.name}"
 
 
-# WIP  slug = AutoSlugField(populate_from=['title'])
 class Article(TimeStampedModel):
     """Model for the user uploaded articles"""
-    title = models.CharField(max_length=120)
-    slug = models.SlugField(max_length=30)
+    title = models.CharField(max_length=120, unique=True)
+    slug = AutoSlugField(populate_from=['title'], unique=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     short_desc = models.CharField(max_length=120)
     long_desc = models.TextField(max_length=1500, blank=True)
@@ -91,10 +90,11 @@ class Article(TimeStampedModel):
             kwargs={'slug': str(self.slug)}
         )
 
-    def save(self, *args, **kwargs):
-        """Slugify the title and save it"""
-        self.slug = slugify(self.title)
-        super(Article, self).save(*args, **kwargs)
+    def get_absolute_url_edit(self):
+        return reverse(
+            "articles:article-edit",
+            kwargs={'slug': str(self.slug)}
+        )
 
 
 class Like(TimeStampedModel):

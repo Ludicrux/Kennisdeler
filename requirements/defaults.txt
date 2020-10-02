@@ -1,7 +1,8 @@
-Django==2.2.16
-django-extensions==3.0.8
-flake8==3.8.3
-django-environ==0.4.5
-Pillow==7.2.0
-psycopg2==2.8.6
-django-filter==2.3.0
+Django==2.2.*
+django-extensions==3.0.*
+flake8==3.8.*
+django-environ==0.4.*
+Pillow==7.2.*
+psycopg2==2.8.*
+django-filter==2.3.*
+django-autoslug-field==0.2.*

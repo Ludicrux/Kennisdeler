@@ -5,10 +5,11 @@ from django.views import generic
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render, redirect
 # from django.contrib.auth import authenticate
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 
 from articles.models import Article
 from articles.filters import ArticleFilter
+from articles.forms import ArticleForm
 
 # timespan of how long the likes will count for the hot order (in days)
 TIME_DELTA = 2
@@ -92,6 +93,7 @@ class ArticleListView(generic.View):
             )
 
         else:
+            """if the url is incorrect"""
             return redirect("articles:article-list", "nieuw")
 
 
@@ -109,6 +111,9 @@ class ArticleDetailView(generic.View):
             "article": article,
         }
 
+        if request.user.is_authenticated & (request.user == article.author):
+            context["articleuser"] = request.user
+
         return render(
                 request,
                 self.template_name,
@@ -125,5 +130,89 @@ class ArticleCreateView(generic.View):
         """
         Render the creation view for Article
         """
-        if request.user.is_authenticated:
-            return redirect("accounts:login")
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        form = ArticleForm()
+        context = {
+            "form": form
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        """save the form to the Article model database"""
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        form = ArticleForm(request.POST, request.FILES)
+        if form.is_valid():
+            article = form.save(commit=False)
+            article.author = get_object_or_404(User, pk=request.user.id)
+            article.save()
+            # slug = form.cleaned_data["slug"]
+            # return redirect("articles:article-detail", slug)
+            return redirect(article.get_absolute_url)
+
+        context = {
+            "form": form
+        }
+
+        return render(request, self.template_name, context)
+
+
+class ArticleEditView(generic.View):
+    """Authenticated user can edit Article"""
+    model = Article
+    template_name = "articles/article_edit.html"
+
+    def get(self, request, *args, **kwargs):
+        """
+        Render the edit view for an object with form filled in with
+        existing data
+        """
+        article = get_object_or_404(Article, slug=kwargs.get("slug"))
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        if not request.user == article.author:
+            return redirect("articles:article-list", "nieuw")
+
+        form = ArticleForm(instance=article)
+        context = {
+            "form": form,
+        }
+
+        return render(
+            request,
+            self.template_name,
+            context
+            )
+
+    def post(self, request, *args, **kwargs):
+        """Update the Article object with the new info"""
+        article = get_object_or_404(Article, slug=kwargs.get("slug"))
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        if not request.user == article.author:
+            return redirect("articles:article-list", "nieuw")
+
+        form = ArticleForm(
+            request.POST or None,
+            request.FILES,
+            instance=article
+        )
+        if form.is_valid():
+            form.save()
+            return redirect(article.get_absolute_url())
+
+        context = {
+            "form": form,
+        }
+
+        return render(
+            request,
+            self.template_name,
+            context
+        )

@@ -1,7 +1,9 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-
+{% if articleuser %}
+<a href="{{ article.get_absolute_url_edit }}">Bewerk kennis</a>
+{% endif %}
     <h1>{{ article.title }}</h1>
     <div>
         {{ article.short_desc }} <br>

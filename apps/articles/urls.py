@@ -9,6 +9,11 @@ from . import views
 app_name = "articles"
 urlpatterns = [
     path(
+        "kennis/<slug:slug>/bewerken",
+        views.ArticleEditView.as_view(),
+        name="article-edit"
+    ),
+    path(
         "kennis/<slug:slug>/",
         views.ArticleDetailView.as_view(),
         name="article-detail"
@@ -18,4 +23,9 @@ urlpatterns = [
         views.ArticleListView.as_view(),
         name="article-list"
         ),
+    path(
+        'nieuwekennis',
+        views.ArticleCreateView.as_view(),
+        name="article-create"
+    ),
 ]
