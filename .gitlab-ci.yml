@@ -1,9 +1,18 @@
 stages:
   - test
+
 before_script:
   - pip install -r requirements/defaults.txt
+
 flake8:
   stage: test
   allow_failure: true
   script:
-    - flake8
+    - time flake8
+
+pylint:
+  stage: test
+  script:
+    - whoami
+    - chmod +x ./cmd/test/pylint.sh
+    - ./cmd/test/pylint.sh
