@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from articles.models import Article
 from articles.filters import ArticleFilter
 from articles.forms import ArticleForm
+from articles.image import Imaging
 
 # timespan of how long the likes will count for the hot order (in days)
 TIME_DELTA = 2
@@ -111,6 +112,7 @@ class ArticleDetailView(generic.View):
             "article": article,
         }
 
+        # Rework line
         if request.user.is_authenticated & (request.user == article.author):
             context["articleuser"] = request.user
 
@@ -150,8 +152,8 @@ class ArticleCreateView(generic.View):
             article = form.save(commit=False)
             article.author = get_object_or_404(User, pk=request.user.id)
             article.save()
-            # slug = form.cleaned_data["slug"]
-            # return redirect("articles:article-detail", slug)
+            image = Imaging(form.cleaned_data["image"])
+            image.resize_by_max(new_width=500)
             return redirect(article.get_absolute_url)
 
         context = {
@@ -168,10 +170,11 @@ class ArticleEditView(generic.View):
 
     def get(self, request, *args, **kwargs):
         """
-        Render the edit view for an object with form filled in with
+        Render the edit view for an object, form filled in with
         existing data
         """
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
+
         if not request.user.is_authenticated:
             return redirect("login")
 
@@ -190,7 +193,9 @@ class ArticleEditView(generic.View):
             )
 
     def post(self, request, *args, **kwargs):
-        """Update the Article object with the new info"""
+        """
+        Update the Article object with the new form details
+        """
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
         if not request.user.is_authenticated:
             return redirect("login")
@@ -205,6 +210,8 @@ class ArticleEditView(generic.View):
         )
         if form.is_valid():
             form.save()
+            image = Imaging(form.cleaned_data["image"])
+            image.resize_by_max(new_width=500)
             return redirect(article.get_absolute_url())
 
         context = {

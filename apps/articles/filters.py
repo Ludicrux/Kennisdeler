@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Article, Subject
+from articles.models import Article, Subject
 import django_filters
 
 
