@@ -12,6 +12,7 @@ class Imaging:
         self.height, self.width = self.img.size
 
     def resize_by_max(self, new_width=0, new_height=0):
+        """Resize by either width or height maintaining aspect ratio"""
         ratio = self.height / self.width
 
         if new_width & new_height:

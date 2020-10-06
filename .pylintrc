@@ -1,6 +1,6 @@
 [MASTER]
 
-ignore=migrations,brp,venv, urls.py, settings
+ignore=migrations,brp,venv, urls.py, settings, image.py
 init-hook="import sys; sys.path.append("apps")"
 
 [MESSAGES CONTROL]
