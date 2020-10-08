@@ -1,4 +1,6 @@
-"""Views for Articles"""
+"""
+Views for Articles
+"""
 from datetime import date, timedelta
 
 from django.views import generic
@@ -10,7 +12,7 @@ from django.contrib.auth.models import User
 from articles.models import Article
 from articles.filters import ArticleFilter
 from articles.forms import ArticleForm
-from articles.image import Imaging
+
 
 # timespan of how long the likes will count for the hot order (in days)
 TIME_DELTA = 2
@@ -152,9 +154,7 @@ class ArticleCreateView(generic.View):
             article = form.save(commit=False)
             article.author = get_object_or_404(User, pk=request.user.id)
             article.save()
-            image = Imaging(form.cleaned_data["image"])
-            image.resize_by_max(new_width=500)
-            return redirect(article.get_absolute_url)
+            return redirect(article.get_absolute_url())
 
         context = {
             "form": form
@@ -210,8 +210,6 @@ class ArticleEditView(generic.View):
         )
         if form.is_valid():
             form.save()
-            image = Imaging(form.cleaned_data["image"])
-            image.resize_by_max(new_width=500)
             return redirect(article.get_absolute_url())
 
         context = {
