@@ -9,6 +9,8 @@ from django.shortcuts import reverse
 from django_extensions.db.models import TimeStampedModel
 from django_extensions.db.fields import AutoSlugField
 
+from lib.images import Imaging
+
 
 LEVEL_CHOICES = [
     (1, "Niveau 1"),
@@ -95,6 +97,13 @@ class Article(TimeStampedModel):
             "articles:article-edit",
             kwargs={'slug': str(self.slug)}
         )
+
+    def save(self, *args, **kwargs):
+        img = Imaging(self.image)
+        img.resize_by_max(new_width=700)
+        self.image = img.save_image()
+
+        super().save(*args, **kwargs)
 
 
 class Like(TimeStampedModel):

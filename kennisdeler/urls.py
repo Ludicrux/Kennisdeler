@@ -5,8 +5,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-# from settings import base
-from kennisdeler.settings import base
+from django.conf import settings
 
 
 urlpatterns = [
@@ -16,5 +15,4 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 
-urlpatterns += static(base.MEDIA_URL, document_root=base.MEDIA_ROOT)
-# urlpatterns += static(base.STATIC_URL, document_root=base.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
