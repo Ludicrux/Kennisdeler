@@ -38,6 +38,13 @@ class Subject(TimeStampedModel):
     def __str__(self):
         return f"{self.name}"
 
+    def save(self, *args, **kwargs):
+        img = Imaging(self.image)
+        img.resize_by_max(new_width=300)
+        self.image = img.save_image()
+
+        super().save(*args, **kwargs)
+
 
 class Tag(TimeStampedModel):
     """Tags used for article"""

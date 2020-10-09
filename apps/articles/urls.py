@@ -3,7 +3,7 @@ URL routing to Articles
 """
 from django.urls import path
 
-from . import views
+from articles import views
 
 
 app_name = "articles"
