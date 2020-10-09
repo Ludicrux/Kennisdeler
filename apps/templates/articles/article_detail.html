@@ -1,7 +1,7 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-{% if articleuser %}
+{% if article_author %}
 <a href="{{ article.get_absolute_url_edit }}">Bewerk kennis</a>
 {% endif %}
     <h1>{{ article.title }}</h1>
@@ -14,16 +14,19 @@
     <div>
         
             {{ article.subject }}
-        
     </div>
     <div>
         {{ article.author }}
-        {{ article.views}}X bekeken / {{ article.downloads }}X gedownload
+        {{ article.views }}X bekeken / {{ article.downloads }}X gedownload
     </div>
     <div>
         DOWNLOADEN     DELEN
-        Opslaan als favoriet
         Like
+        {% if article_favorite %}
+            <a href="{% url 'articles:article-favorite' slug=article.slug %}">Unfavorite</a>
+        {% else %}
+            <a href="{% url 'articles:article-favorite' slug=article.slug %}">Favorite</a>
+        {% endif %}
     </div>
     <div>
         STUUR EEN PERSOONLIJK BEDANKJE

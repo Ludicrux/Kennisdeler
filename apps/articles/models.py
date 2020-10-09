@@ -87,6 +87,12 @@ class Article(TimeStampedModel):
     is_public = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
     downloads = models.IntegerField(default=0)
+    user_favorites = models.ManyToManyField(
+        User,
+        blank=True,
+        through="Favorite",
+        related_name="user_favorites"
+    )
 
     class Meta:
         """META"""
@@ -97,13 +103,14 @@ class Article(TimeStampedModel):
         return f"{self.title}"
 
     def get_absolute_url(self):
-        """return url for objects detail view"""
+        """return url for for the detail view"""
         return reverse(
             "articles:article-detail",
             kwargs={'slug': str(self.slug)}
         )
 
     def get_absolute_url_edit(self):
+        """return the url for the edit view"""
         return reverse(
             "articles:article-edit",
             kwargs={'slug': str(self.slug)}
@@ -121,6 +128,15 @@ class Article(TimeStampedModel):
 
 class Like(TimeStampedModel):
     """Model to filter the article by popularity"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.created}"
+
+
+class Favorite(TimeStampedModel):
+    """Model to allow sorting of favorites by most recent"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
