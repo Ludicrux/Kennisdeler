@@ -38,6 +38,15 @@ class Subject(TimeStampedModel):
     def __str__(self):
         return f"{self.name}"
 
+    def save(self, *args, **kwargs):
+        """save function override"""
+        # Image resizing
+        img = Imaging(self.image)
+        img.resize_by_max(new_height=300)
+        self.image = img.save_image()
+
+        super().save(*args, **kwargs)
+
 
 class Tag(TimeStampedModel):
     """Tags used for article"""
@@ -80,6 +89,7 @@ class Article(TimeStampedModel):
     downloads = models.IntegerField(default=0)
 
     class Meta:
+        """META"""
         verbose_name = "Artikel"
         verbose_name_plural = "Artikelen"
 
@@ -87,6 +97,7 @@ class Article(TimeStampedModel):
         return f"{self.title}"
 
     def get_absolute_url(self):
+        """return url for objects detail view"""
         return reverse(
             "articles:article-detail",
             kwargs={'slug': str(self.slug)}
@@ -99,6 +110,8 @@ class Article(TimeStampedModel):
         )
 
     def save(self, *args, **kwargs):
+        """save function override"""
+        # image resizing
         img = Imaging(self.image)
         img.resize_by_max(new_width=700)
         self.image = img.save_image()

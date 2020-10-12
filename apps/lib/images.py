@@ -15,6 +15,9 @@ class Imaging:
         self.img = Image.open(image)
         self.img.convert('RGB')
         self.height, self.width = self.img.size
+        self.filetype = image.name.split(".")[-1].upper()
+        if self.filetype == "JPG":
+            self.filetype = "JPEG"
 
     def resize_by_max(self, new_width=0, new_height=0):
         """Resize by either width or height maintaining aspect ratio"""
@@ -36,6 +39,7 @@ class Imaging:
         """Save the image and return the object"""
         ImageOps.exif_transpose(self.img)
         img_io = BytesIO()
-        self.img.save(img_io, 'JPEG', quality=85)
+
+        self.img.save(img_io, self.filetype, quality=85)
         image_object = File(img_io, name=self.image.name)
         return image_object
