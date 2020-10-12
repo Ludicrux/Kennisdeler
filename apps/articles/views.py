@@ -8,6 +8,7 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render, redirect
 # from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 from articles.models import Article
 from articles.filters import ArticleFilter
@@ -56,8 +57,9 @@ class ArticleListView(generic.View):
             return redirect("articles:article-list", "nieuw")
 
         if "favorite" in request.GET:
-            context["favorite_selected"] = True
-            article = article.filter(user_favorites=request.user)
+            if request.user.is_authenticated:
+                context["favorite_selected"] = True
+                article = article.filter(user_favorites=request.user)
 
         article_filter = ArticleFilter(
             request.GET,
@@ -100,6 +102,7 @@ class ArticleDetailView(generic.View):
             )
 
 
+@login_required
 def FavoriteArticle(request, *args, **kwargs):
     """favorite or unfavorite an article"""
     article = get_object_or_404(Article, slug=kwargs.get("slug"))
