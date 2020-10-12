@@ -6,6 +6,7 @@
     <a href="{% url 'articles:article-create' %}">Nieuwe kennis toevoegen</a> <br>
     <a href="{% url 'articles:article-list' 'nieuw' %}">KennisBank</a> <br>
     <a href="{% url 'core:homepage' %}">Home</a><br>
+    <a href="{% url 'comments:comment-list' %}">Bedankjes</a><br>
 {% else %}
     <li><a href="{% url 'login' %}">Login</a></li>
 {% endif %}

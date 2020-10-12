@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<br>
+{% for comment in comment_list %}
+    {{ comment.author }}<br>
+    om: {{ comment.created }}<br>
+    Op jouw kennis: {{ comment.article }} <br>
+    {{ comment.message }}<br><br>
+{% endfor %}
+{% endblock %}

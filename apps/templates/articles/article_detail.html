@@ -29,7 +29,14 @@
         {% endif %}
     </div>
     <div>
+        {% if comment_form %}
         STUUR EEN PERSOONLIJK BEDANKJE
+        <form action="{% url 'articles:article-comment' slug=article.slug %}" method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+        <input type="submit" value="Submit">
+        {% endif %}
+    </form>
         MESSAGE FIELD
         VERSTUUR
     </div>

@@ -13,8 +13,8 @@ urlpatterns = [
     path("", include("core.urls")),
     path("kennisbank/", include("articles.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
-    # Change pathing through user profiles
-    path("berichten/", include("comments.urls")),
+    # Send pathing through user profiles
+    path("bedankjes/", include("comments.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
