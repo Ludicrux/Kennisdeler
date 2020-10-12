@@ -9,10 +9,20 @@ sorteren op:<br>
 {{ article_list.qs.count }} gevonden van {{ article_count }} totaal <br>
 
 <form method="get">
+    <label for="favorite">Favorieten:</label>
+    <input 
+        {% if favorite_selected %}
+            checked
+        {% endif %}
+    type="checkbox" id="favorite" name="favorite"
+    >
+        <option value="True"></option>
+    </input>
     {{ article_list.form.as_p }}
     <button type="submit">Search</button>
 </form>
 <br>
+{{ fav_test }}
 {% for article in article_list.qs %}
     <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> <br>
     {{ article.created|date}} {{ article.user_likes.count }} likes <br>

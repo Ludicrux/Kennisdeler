@@ -14,6 +14,11 @@ urlpatterns = [
         name="article-edit"
     ),
     path(
+        "kennis/<slug:slug>/favorite",
+        views.FavoriteArticle,
+        name="article-favorite"
+    ),
+    path(
         "kennis/<slug:slug>/",
         views.ArticleDetailView.as_view(),
         name="article-detail"

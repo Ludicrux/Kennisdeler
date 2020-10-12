@@ -39,8 +39,10 @@ class Subject(TimeStampedModel):
         return f"{self.name}"
 
     def save(self, *args, **kwargs):
+        """save function override"""
+        # Image resizing
         img = Imaging(self.image)
-        img.resize_by_max(new_width=300)
+        img.resize_by_max(new_height=300)
         self.image = img.save_image()
 
         super().save(*args, **kwargs)
@@ -85,8 +87,15 @@ class Article(TimeStampedModel):
     is_public = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
     downloads = models.IntegerField(default=0)
+    user_favorites = models.ManyToManyField(
+        User,
+        blank=True,
+        through="Favorite",
+        related_name="user_favorites"
+    )
 
     class Meta:
+        """META"""
         verbose_name = "Artikel"
         verbose_name_plural = "Artikelen"
 
@@ -94,18 +103,22 @@ class Article(TimeStampedModel):
         return f"{self.title}"
 
     def get_absolute_url(self):
+        """return url for for the detail view"""
         return reverse(
             "articles:article-detail",
             kwargs={'slug': str(self.slug)}
         )
 
     def get_absolute_url_edit(self):
+        """return the url for the edit view"""
         return reverse(
             "articles:article-edit",
             kwargs={'slug': str(self.slug)}
         )
 
     def save(self, *args, **kwargs):
+        """save function override"""
+        # image resizing
         img = Imaging(self.image)
         img.resize_by_max(new_width=700)
         self.image = img.save_image()
@@ -115,6 +128,15 @@ class Article(TimeStampedModel):
 
 class Like(TimeStampedModel):
     """Model to filter the article by popularity"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.created}"
+
+
+class Favorite(TimeStampedModel):
+    """Model to allow sorting of favorites by most recent"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 

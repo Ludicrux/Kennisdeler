@@ -8,6 +8,7 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render, redirect
 # from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 from articles.models import Article
 from articles.filters import ArticleFilter
@@ -24,27 +25,16 @@ class ArticleListView(generic.View):
     template_name = "articles/article_list.html"
 
     def get(self, request, *args, **kwargs):
+        article_count = Article.objects.all().count()
+        context = {
+            "article_count": article_count
+        }
+
         if self.kwargs["order_by"] == "nieuw":
             """
             Order by newest first
             """
             article = Article.objects.all().order_by('-created')
-            article_filter = ArticleFilter(
-                request.GET,
-                queryset=article,
-                request=request
-            )
-            article_count = Article.objects.all().count()
-            context = {
-                "article_list": article_filter,
-                "article_count": article_count
-            }
-
-            return render(
-                request,
-                self.template_name,
-                context
-            )
 
         elif self.kwargs["order_by"] == "populair":
             """
@@ -53,22 +43,6 @@ class ArticleListView(generic.View):
             article = Article.objects.annotate(
                 num_likes=Count("user_likes")
             ).order_by("-num_likes")
-            article_filter = ArticleFilter(
-                request.GET,
-                queryset=article,
-                request=request
-            )
-            article_count = Article.objects.all().count()
-            context = {
-                "article_list": article_filter,
-                "article_count": article_count
-            }
-
-            return render(
-                request,
-                self.template_name,
-                context
-            )
 
         elif self.kwargs["order_by"] == "hot":
             """
@@ -78,26 +52,27 @@ class ArticleListView(generic.View):
             article = Article.objects.annotate(
                 num_likes=Count("user_likes", filter=Q(created__gte=last_week))
             ).order_by("-num_likes")
-            article_filter = ArticleFilter(
-                request.GET,
-                queryset=article,
-                request=request
-            )
-            article_count = Article.objects.all().count()
-            context = {
-                "article_list": article_filter,
-                "article_count": article_count
-            }
-
-            return render(
-                request,
-                self.template_name,
-                context
-            )
 
         else:
-            """if the url is incorrect"""
             return redirect("articles:article-list", "nieuw")
+
+        if "favorite" in request.GET:
+            if request.user.is_authenticated:
+                context["favorite_selected"] = True
+                article = article.filter(user_favorites=request.user)
+
+        article_filter = ArticleFilter(
+            request.GET,
+            queryset=article,
+            request=request
+        )
+        context["article_list"] = article_filter
+
+        return render(
+            request,
+            self.template_name,
+            context
+        )
 
 
 class ArticleDetailView(generic.View):
@@ -114,15 +89,28 @@ class ArticleDetailView(generic.View):
             "article": article,
         }
 
-        # Rework line
         if request.user.is_authenticated & (request.user == article.author):
-            context["articleuser"] = request.user
+            context["article_author"] = request.user
+
+        if request.user in article.user_favorites.all():
+            context["article_favorite"] = request.user
 
         return render(
                 request,
                 self.template_name,
                 context
             )
+
+
+@login_required
+def FavoriteArticle(request, *args, **kwargs):
+    """favorite or unfavorite an article"""
+    article = get_object_or_404(Article, slug=kwargs.get("slug"))
+    if request.user in article.user_favorites.all():
+        article.user_favorites.remove(request.user)
+    else:
+        article.user_favorites.add(request.user)
+    return redirect(article.get_absolute_url())
 
 
 class ArticleCreateView(generic.View):
