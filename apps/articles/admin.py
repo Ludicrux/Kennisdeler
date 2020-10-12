@@ -1,3 +1,6 @@
+"""
+Article admin view
+"""
 from django.contrib import admin
 from .models import Subject, Tag, Article, Like
 
