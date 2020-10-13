@@ -100,17 +100,18 @@ class Article(TimeStampedModel):
         verbose_name_plural = "Artikelen"
 
     def __str__(self):
+        """return the title"""
         return f"{self.title}"
 
     def get_absolute_url(self):
-        """return url for for the detail view"""
+        """returns url for for the detail view"""
         return reverse(
             "articles:article-detail",
             kwargs={'slug': str(self.slug)}
         )
 
     def get_absolute_url_edit(self):
-        """return the url for the edit view"""
+        """returns the url for the edit view"""
         return reverse(
             "articles:article-edit",
             kwargs={'slug': str(self.slug)}
@@ -132,6 +133,7 @@ class Like(TimeStampedModel):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
     def __str__(self):
+        """returns the creation datetime"""
         return f"{self.created}"
 
 
@@ -141,4 +143,5 @@ class Favorite(TimeStampedModel):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
     def __str__(self):
+        """returns the creation datetime"""
         return f"{self.created}"

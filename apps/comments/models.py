@@ -1,5 +1,5 @@
 """
-Models for user written comments
+Models for comments
 """
 
 from django.db import models

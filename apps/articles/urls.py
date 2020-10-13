@@ -1,5 +1,6 @@
 """
 URL routing to Articles
+url: /kennisbank/
 """
 from django.urls import path
 

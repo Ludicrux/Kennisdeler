@@ -1,5 +1,6 @@
 """
-URL routing to Messages
+URL routing to comments
+url: /bedankje/
 """
 from django.urls import path
 

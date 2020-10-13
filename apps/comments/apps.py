@@ -1,3 +1,6 @@
+"""
+App Comments
+"""
 from django.apps import AppConfig
 
 

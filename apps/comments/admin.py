@@ -1,5 +1,5 @@
 """
-message admin view
+Comment admin
 """
 from django.contrib import admin
 from .models import Comment

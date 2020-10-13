@@ -16,8 +16,7 @@ from articles.forms import ArticleForm
 from comments.forms import CommentForm
 
 
-# timespan of how long the likes will count for the hot order (in days)
-TIME_DELTA = 2
+TIME_DELTA = 2      # days
 
 
 class ArticleListView(generic.View):
@@ -47,7 +46,7 @@ class ArticleListView(generic.View):
 
         elif self.kwargs["order_by"] == "hot":
             """
-            Order by most likes over the last week
+            Order by most likes over the TIME_DELTA in days
             """
             last_week = date.today() - timedelta(days=TIME_DELTA)
             article = Article.objects.annotate(
@@ -217,6 +216,9 @@ class ArticleEditView(generic.View):
 
 
 def CreateComment(request, *args, **kwargs):
+    """
+    User created comment
+    """
     form = CommentForm(request.POST)
     author = get_object_or_404(User, pk=request.user.id)
     article = get_object_or_404(Article, slug=kwargs.get("slug"))
