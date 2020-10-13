@@ -35,7 +35,13 @@ class Subject(TimeStampedModel):
     name = models.CharField(max_length=25, unique=True)
     image = models.ImageField(upload_to="images/subject-images/")
 
+    class Meta:
+        """META"""
+        verbose_name = "Opleiding"
+        verbose_name_plural = "Opleidingen"
+
     def __str__(self):
+        """Returns name stirng"""
         return f"{self.name}"
 
     def save(self, *args, **kwargs):
@@ -52,7 +58,13 @@ class Tag(TimeStampedModel):
     """Tags used for article"""
     name = models.CharField(max_length=25, unique=True)
 
+    class Meta:
+        """META"""
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"
+
     def __str__(self):
+        """Returns name stirng"""
         return f"{self.name}"
 
 
@@ -69,7 +81,8 @@ class Article(TimeStampedModel):
     )
     uploaded_file = models.FileField(
         upload_to="documents/article-documents",
-        verbose_name="articledoc"
+        verbose_name="articledoc",
+        blank=True
     )
     user_likes = models.ManyToManyField(
         User, blank=True, through="Like", related_name="user_likes"
@@ -100,7 +113,7 @@ class Article(TimeStampedModel):
         verbose_name_plural = "Artikelen"
 
     def __str__(self):
-        """return the title"""
+        """return the string title"""
         return f"{self.title}"
 
     def get_absolute_url(self):
@@ -132,6 +145,11 @@ class Like(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
+    class Meta:
+        """META"""
+        verbose_name = "Like"
+        verbose_name_plural = "Likes"
+
     def __str__(self):
         """returns the creation datetime"""
         return f"{self.created}"
@@ -141,6 +159,12 @@ class Favorite(TimeStampedModel):
     """Model to allow sorting of favorites by most recent"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    class Meta:
+        """META"""
+        verbose_name = "Favoriet"
+        verbose_name_plural = "Favorieten"
+
 
     def __str__(self):
         """returns the creation datetime"""

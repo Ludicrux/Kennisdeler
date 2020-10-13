@@ -1,6 +1,7 @@
 {% extends "core/base.html" %}
 
 {% block content %}
+<h1> OPLEIDINGEN </h1>
 <br>
 {% for subject in subject_list %}
     <a href="{% url 'articles:article-list' order_by='hot' %}?subject={{subject.id}}"> {{ subject.name }}</a><br>

@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 # from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from articles.models import Article
 from articles.filters import ArticleFilter
@@ -56,10 +57,15 @@ class ArticleListView(generic.View):
         else:
             return redirect("articles:article-list", "nieuw")
 
+        # narrow filter to public only
+        # article = article.filter(is_public=True)
+
+        if request.user.is_authenticated:
+            context["logged_in"] = True
+
         if "favorite" in request.GET:
-            if request.user.is_authenticated:
-                context["favorite_selected"] = True
-                article = article.filter(user_favorites=request.user)
+            context["favorite_selected"] = True
+            article = article.filter(user_favorites=request.user)
 
         article_filter = ArticleFilter(
             request.GET,
@@ -68,11 +74,7 @@ class ArticleListView(generic.View):
         )
         context["article_list"] = article_filter
 
-        return render(
-            request,
-            self.template_name,
-            context
-        )
+        return render(request, self.template_name, context)
 
 
 class ArticleDetailView(generic.View):
@@ -89,25 +91,23 @@ class ArticleDetailView(generic.View):
             "article": article,
         }
 
-        if request.user.is_authenticated & (request.user == article.author):
-            context["article_author"] = request.user
+        # Check to see if the current user is the author of the article
+        if request.user.is_authenticated:
+            if request.user == article.author:
+                context["article_author"] = request.user
+            else:
+                commentform = CommentForm()
+                context["comment_form"] = commentform
 
+        # Check if the user favorited the post
         if request.user in article.user_favorites.all():
             context["article_favorite"] = request.user
 
-        if not request.user == article.author:
-            commentform = CommentForm()
-            context["comment_form"] = commentform
-
-        return render(
-                request,
-                self.template_name,
-                context
-            )
+        return render(request, self.template_name, context)
 
 
 @login_required
-def FavoriteArticle(request, *args, **kwargs):
+def favorite_article(request, *args, **kwargs):
     """favorite or unfavorite an article"""
     article = get_object_or_404(Article, slug=kwargs.get("slug"))
     if request.user in article.user_favorites.all():
@@ -117,6 +117,7 @@ def FavoriteArticle(request, *args, **kwargs):
     return redirect(article.get_absolute_url())
 
 
+@method_decorator(login_required, name="dispatch")
 class ArticleCreateView(generic.View):
     """Creation view for Article"""
     model = Article
@@ -126,9 +127,6 @@ class ArticleCreateView(generic.View):
         """
         Render the creation view for Article
         """
-        if not request.user.is_authenticated:
-            return redirect("login")
-
         form = ArticleForm()
         context = {
             "form": form
@@ -138,9 +136,6 @@ class ArticleCreateView(generic.View):
 
     def post(self, request, *args, **kwargs):
         """save the form to the Article model database"""
-        if not request.user.is_authenticated:
-            return redirect("login")
-
         form = ArticleForm(request.POST, request.FILES)
         if form.is_valid():
             article = form.save(commit=False)
@@ -155,6 +150,7 @@ class ArticleCreateView(generic.View):
         return render(request, self.template_name, context)
 
 
+@method_decorator(login_required, name="dispatch")
 class ArticleEditView(generic.View):
     """Authenticated user can edit Article"""
     model = Article
@@ -167,9 +163,6 @@ class ArticleEditView(generic.View):
         """
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
 
-        if not request.user.is_authenticated:
-            return redirect("login")
-
         if not request.user == article.author:
             return redirect("articles:article-list", "nieuw")
 
@@ -178,19 +171,13 @@ class ArticleEditView(generic.View):
             "form": form,
         }
 
-        return render(
-            request,
-            self.template_name,
-            context
-            )
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         """
         Update the Article object with the new form details
         """
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
-        if not request.user.is_authenticated:
-            return redirect("login")
 
         if not request.user == article.author:
             return redirect("articles:article-list", "nieuw")
@@ -208,14 +195,11 @@ class ArticleEditView(generic.View):
             "form": form,
         }
 
-        return render(
-            request,
-            self.template_name,
-            context
-        )
+        return render(request, self.template_name, context)
 
 
-def CreateComment(request, *args, **kwargs):
+@login_required
+def create_comment(request, *args, **kwargs):
     """
     User created comment
     """
@@ -223,7 +207,6 @@ def CreateComment(request, *args, **kwargs):
     author = get_object_or_404(User, pk=request.user.id)
     article = get_object_or_404(Article, slug=kwargs.get("slug"))
     if request.user == article.author:
-        # add warning message that you cant comment on your own post
         return redirect(article.get_absolute_url())
 
     if form.is_valid():
@@ -231,4 +214,5 @@ def CreateComment(request, *args, **kwargs):
         comment.author = author
         comment.article = article
         comment.save()
+
     return redirect(article.get_absolute_url())

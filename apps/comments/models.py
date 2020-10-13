@@ -24,5 +24,11 @@ class Comment(TimeStampedModel):
     message = models.TextField(max_length=257)
     seen = models.BooleanField(default=0)
 
+    class Meta:
+        """META"""
+        verbose_name = "Comment"
+        verbose_name_plural = "Comments"
+
+
     def __str__(self):
         return f"{self.message}"

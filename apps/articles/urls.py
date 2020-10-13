@@ -16,12 +16,12 @@ urlpatterns = [
     ),
     path(
         "kennis/<slug:slug>/favorite",
-        views.FavoriteArticle,
+        views.favorite_article,
         name="article-favorite"
     ),
     path(
         "kennis/<slug:slug>/comment",
-        views.CreateComment,
+        views.create_comment,
         name="article-comment"
     ),
     path(
