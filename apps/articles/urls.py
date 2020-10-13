@@ -1,5 +1,6 @@
 """
 URL routing to Articles
+url: /kennisbank/
 """
 from django.urls import path
 
@@ -17,6 +18,11 @@ urlpatterns = [
         "kennis/<slug:slug>/favorite",
         views.FavoriteArticle,
         name="article-favorite"
+    ),
+    path(
+        "kennis/<slug:slug>/comment",
+        views.CreateComment,
+        name="article-comment"
     ),
     path(
         "kennis/<slug:slug>/",

@@ -13,10 +13,10 @@ from django.contrib.auth.decorators import login_required
 from articles.models import Article
 from articles.filters import ArticleFilter
 from articles.forms import ArticleForm
+from comments.forms import CommentForm
 
 
-# timespan of how long the likes will count for the hot order (in days)
-TIME_DELTA = 2
+TIME_DELTA = 2      # days
 
 
 class ArticleListView(generic.View):
@@ -46,7 +46,7 @@ class ArticleListView(generic.View):
 
         elif self.kwargs["order_by"] == "hot":
             """
-            Order by most likes over the last week
+            Order by most likes over the TIME_DELTA in days
             """
             last_week = date.today() - timedelta(days=TIME_DELTA)
             article = Article.objects.annotate(
@@ -94,6 +94,10 @@ class ArticleDetailView(generic.View):
 
         if request.user in article.user_favorites.all():
             context["article_favorite"] = request.user
+
+        if not request.user == article.author:
+            commentform = CommentForm()
+            context["comment_form"] = commentform
 
         return render(
                 request,
@@ -209,3 +213,22 @@ class ArticleEditView(generic.View):
             self.template_name,
             context
         )
+
+
+def CreateComment(request, *args, **kwargs):
+    """
+    User created comment
+    """
+    form = CommentForm(request.POST)
+    author = get_object_or_404(User, pk=request.user.id)
+    article = get_object_or_404(Article, slug=kwargs.get("slug"))
+    if request.user == article.author:
+        # add warning message that you cant comment on your own post
+        return redirect(article.get_absolute_url())
+
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = author
+        comment.article = article
+        comment.save()
+    return redirect(article.get_absolute_url())

@@ -1,3 +1,6 @@
+"""
+App Core
+"""
 from django.apps import AppConfig
 
 

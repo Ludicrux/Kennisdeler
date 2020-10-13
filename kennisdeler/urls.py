@@ -1,5 +1,5 @@
 """
-Core URL patterns
+Base URL patterns
 """
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -12,8 +12,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("core.urls")),
     path("kennisbank/", include("articles.urls")),
-    # path("profile/", include("profiles.urls")),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path("accounts/", include("django.contrib.auth.urls")),
+    # Send pathing through user profiles
+    path("bedankjes/", include("comments.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

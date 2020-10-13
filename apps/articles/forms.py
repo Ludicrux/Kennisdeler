@@ -1,4 +1,7 @@
-"""Create and update forms for Article model and views"""
+
+"""
+Forms for articles
+"""
 from django.forms import ModelForm
 # from django.forms import ClearableFileInput
 
@@ -6,6 +9,9 @@ from articles.models import Article
 
 
 class ArticleForm(ModelForm):
+    """
+    Create or update an article
+    """
     class Meta:
         model = Article
         fields = [
