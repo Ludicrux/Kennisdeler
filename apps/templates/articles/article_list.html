@@ -26,6 +26,7 @@ sorteren op:<br>
 <br>
 
 {% for article in article_list.qs %}
+    <img src="{{ article.image.url }}">
     <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> <br>
     {{ article.created|date}} {{ article.user_likes.count }} likes <br>
     {{ article.short_desc }} <br>

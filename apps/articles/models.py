@@ -8,6 +8,7 @@ from django.shortcuts import reverse
 
 from django_extensions.db.models import TimeStampedModel
 from django_extensions.db.fields import AutoSlugField
+from django_resized import ResizedImageField
 
 from lib.images import Imaging
 
@@ -75,13 +76,20 @@ class Article(TimeStampedModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     short_desc = models.CharField(max_length=120)
     long_desc = models.TextField(max_length=1500, blank=True)
-    image = models.ImageField(
+    image = ResizedImageField(
+        quality=100,
+        size=[1000, 500],
         upload_to="images/article-images",
-        verbose_name="articleimg"
+    )
+    thumb = ResizedImageField(
+        quality=100,
+        size=[40, 40],
+        crop=["middle", "center"],
+        blank=True,
+        upload_to="images/article-thumbnail",
     )
     uploaded_file = models.FileField(
         upload_to="documents/article-documents",
-        verbose_name="articledoc",
         blank=True
     )
     user_likes = models.ManyToManyField(
@@ -129,15 +137,6 @@ class Article(TimeStampedModel):
             "articles:article-edit",
             kwargs={'slug': str(self.slug)}
         )
-
-    def save(self, *args, **kwargs):
-        """save function override"""
-        # image resizing
-        img = Imaging(self.image)
-        img.resize_by_max(new_width=700)
-        self.image = img.save_image()
-
-        super().save(*args, **kwargs)
 
 
 class Like(TimeStampedModel):
