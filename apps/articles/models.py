@@ -7,14 +7,10 @@ from django.contrib.auth.models import User
 from django.shortcuts import reverse
 
 from django_extensions.db.models import TimeStampedModel
+from django_extensions.db.fields import AutoSlugField
 
+from lib.images import Imaging
 
-SUBJECT_CHOICES = [
-    ("ASF", "Asfalt"),
-    ("AST", "Assistent"),
-    ("BES", "Bestratingen"),
-    ("BET", "Betonboren"),
-]
 
 LEVEL_CHOICES = [
     (1, "Niveau 1"),
@@ -34,8 +30,26 @@ FILE_TYPE_CHOICES = [
 ]
 
 
+class Subject(TimeStampedModel):
+    """Subjects used for the article"""
+    name = models.CharField(max_length=25, unique=True)
+    image = models.ImageField(upload_to="images/subject-images/")
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        """save function override"""
+        # Image resizing
+        img = Imaging(self.image)
+        img.resize_by_max(new_height=300)
+        self.image = img.save_image()
+
+        super().save(*args, **kwargs)
+
+
 class Tag(TimeStampedModel):
-    """tags used for article"""
+    """Tags used for article"""
     name = models.CharField(max_length=25, unique=True)
 
     def __str__(self):
@@ -44,38 +58,90 @@ class Tag(TimeStampedModel):
 
 class Article(TimeStampedModel):
     """Model for the user uploaded articles"""
-    title = models.CharField(max_length=120)
-    slug = models.SlugField(max_length=30)
+    title = models.CharField(max_length=120, unique=True)
+    slug = AutoSlugField(populate_from=['title'], unique=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     short_desc = models.CharField(max_length=120)
-    long_desc = models.TextField(max_length=1500, blank=True, null=True)
-    image = models.ImageField(upload_to="images/article-images/")
-    uploaded_file = models.FileField(upload_to="documents/article-documents/")
-    user_likes = models.ManyToManyField(
-        User, blank=True, null=True, related_name="user_likes"
+    long_desc = models.TextField(max_length=1500, blank=True)
+    image = models.ImageField(
+        upload_to="images/article-images",
+        verbose_name="articleimg"
     )
-    subject = models.CharField(
-        max_length=3, choices=SUBJECT_CHOICES, default="ASF"
+    uploaded_file = models.FileField(
+        upload_to="documents/article-documents",
+        verbose_name="articledoc"
+    )
+    user_likes = models.ManyToManyField(
+        User, blank=True, through="Like", related_name="user_likes"
+    )
+    subject = models.ForeignKey(
+        Subject, null=True, on_delete=models.SET_NULL
     )
     level = models.IntegerField(
         choices=LEVEL_CHOICES, default=1
     )
-    tags = models.ManyToManyField(Tag, blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     file_type = models.CharField(
         max_length=3, choices=FILE_TYPE_CHOICES, default="3DB"
     )
     is_public = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
-    downloads = models.ManyToManyField(
-        User, blank=True, null=True, related_name="user_downloads"
+    downloads = models.IntegerField(default=0)
+    user_favorites = models.ManyToManyField(
+        User,
+        blank=True,
+        through="Favorite",
+        related_name="user_favorites"
     )
 
     class Meta:
+        """META"""
         verbose_name = "Artikel"
         verbose_name_plural = "Artikelen"
 
     def __str__(self):
+        """return the title"""
         return f"{self.title}"
 
     def get_absolute_url(self):
-        return reverse("articlepage", args=[self.slug])
+        """returns url for for the detail view"""
+        return reverse(
+            "articles:article-detail",
+            kwargs={'slug': str(self.slug)}
+        )
+
+    def get_absolute_url_edit(self):
+        """returns the url for the edit view"""
+        return reverse(
+            "articles:article-edit",
+            kwargs={'slug': str(self.slug)}
+        )
+
+    def save(self, *args, **kwargs):
+        """save function override"""
+        # image resizing
+        img = Imaging(self.image)
+        img.resize_by_max(new_width=700)
+        self.image = img.save_image()
+
+        super().save(*args, **kwargs)
+
+
+class Like(TimeStampedModel):
+    """Model to filter the article by popularity"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    def __str__(self):
+        """returns the creation datetime"""
+        return f"{self.created}"
+
+
+class Favorite(TimeStampedModel):
+    """Model to allow sorting of favorites by most recent"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    def __str__(self):
+        """returns the creation datetime"""
+        return f"{self.created}"

@@ -1,0 +1,9 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<br>
+{% for subject in subject_list %}
+    <a href="{% url 'articles:article-list' order_by='hot' %}?subject={{subject.id}}"> {{ subject.name }}</a><br>
+    <img src="{{ subject.image.url }}"><br>
+{% endfor %}
+{% endblock %}

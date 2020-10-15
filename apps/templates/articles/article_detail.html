@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+{% if article_author %}
+<a href="{{ article.get_absolute_url_edit }}">Bewerk kennis</a>
+{% endif %}
+    <h1>{{ article.title }}</h1>
+    <div>
+        {{ article.short_desc }} <br>
+        {{ article.created|date }} <br>
+        <img src="{{ article.image.url }}">
+    </div>
+    File here
+    <div>
+        
+            {{ article.subject }}
+    </div>
+    <div>
+        {{ article.author }}
+        {{ article.views }}X bekeken / {{ article.downloads }}X gedownload
+    </div>
+    <div>
+        DOWNLOADEN     DELEN
+        Like
+        {% if article_favorite %}
+            <a href="{% url 'articles:article-favorite' slug=article.slug %}">Unfavorite</a>
+        {% else %}
+            <a href="{% url 'articles:article-favorite' slug=article.slug %}">Favorite</a>
+        {% endif %}
+    </div>
+    <div>
+        {% if comment_form %}
+        STUUR EEN PERSOONLIJK BEDANKJE
+        <form action="{% url 'articles:article-comment' slug=article.slug %}" method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+        <input type="submit" value="Submit">
+        {% endif %}
+    </form>
+        MESSAGE FIELD
+        VERSTUUR
+    </div>
+    <div>
+        Hier is iets niet in orde
+    </div>
+    VERGELIJKBAAR
+
+{% endblock %}

@@ -10,30 +10,40 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-import os
+import sys
+from pathlib import Path
 
 import environ
 
 
+ROOT_DIR = environ.Path(__file__) - 3
+ENVAPPS_DIR = ROOT_DIR.path("apps")
+sys.path.append(str(ENVAPPS_DIR))
 env = environ.Env(
-
     DEBUG=(bool, False)
 )
-
-environ.Env.read_env()
-
+env.read_env(str(ROOT_DIR.path(".env")))
 
 DEBUG = env('DEBUG')
 
 SECRET_KEY = env('SECRET_KEY')
 
-DATABASE = {
-    'default': env.db()
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": env("DATABASE_NAME"),
+        "USER": env("DATABASE_USER"),
+        "ATOMIC_REQUESTS": True,
+        # Lower CONN_MAX_AGE if postgres "too many connections" errors.
+        "CONN_MAX_AGE": 60,
+    }
 }
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+APPS_DIR = Path(BASE_DIR).joinpath('apps')
 
 ALLOWED_HOSTS = []
 
@@ -48,7 +58,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.articles',
+    'articles',
+    'comments',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -66,7 +78,7 @@ ROOT_URLCONF = 'kennisdeler.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [Path(BASE_DIR).joinpath('templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -114,6 +126,32 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+STATICFILES_DIRS = [
+    Path(BASE_DIR).joinpath('static'),
+]
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = Path(BASE_DIR).joinpath('media')
 MEDIA_URL = '/media/'
+
+
+CONTEXT_PROCESSORS = [
+    "django.contrib.auth.context_processors.auth",
+    "django.contrib.messages.context_processors.messages",
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [APPS_DIR / 'templates'],
+        "OPTIONS": {
+            "context_processors": CONTEXT_PROCESSORS,
+            "loaders": [
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ]
+        },
+    },
+]
+
+LOGIN_REDIRECT_URL = '/kennisbank/nieuw'
