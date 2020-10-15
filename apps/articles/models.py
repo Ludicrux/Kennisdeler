@@ -32,7 +32,11 @@ FILE_TYPE_CHOICES = [
 class Subject(TimeStampedModel):
     """Subjects used for the article"""
     name = models.CharField(max_length=25, unique=True)
-    image = models.ImageField(upload_to="images/subject-images/")
+    image = ResizedImageField(
+        quality=100,
+        size=[300, 300],
+        upload_to="images/subject-images",
+    )
 
     class Meta:
         """META"""
@@ -42,15 +46,6 @@ class Subject(TimeStampedModel):
     def __str__(self):
         """Returns name stirng"""
         return f"{self.name}"
-
-    def save(self, *args, **kwargs):
-        """save function override"""
-        # Image resizing
-        img = Imaging(self.image)
-        img.resize_by_max(new_height=300)
-        self.image = img.save_image()
-
-        super().save(*args, **kwargs)
 
 
 class Tag(TimeStampedModel):
