@@ -1,9 +1,12 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-{% if article_author %}
-<a href="{{ article.get_absolute_url_edit }}">Bewerk kennis</a>
-{% endif %}
+        {% if article_author %}
+            <a href="{{ article.get_absolute_url_edit }}">Bewerk kennis</a><br>
+        {% endif %}
+        {% if not_public %}
+            KENNIS STAAT OP PRIVÉ <br>
+        {% endif %}
     <h1>{{ article.title }}</h1>
     <div>
         {{ article.short_desc }} <br>
@@ -38,8 +41,6 @@
         <input type="submit" value="Submit">
         {% endif %}
     </form>
-        MESSAGE FIELD
-        VERSTUUR
     </div>
     <div>
         Hier is iets niet in orde

@@ -26,18 +26,20 @@ class ArticleListView(generic.View):
     template_name = "articles/article_list.html"
 
     def get(self, request, *args, **kwargs):
-        article_count = Article.objects.all().count()
+        article_count = Article.objects.filter(is_public=True).count()
         context = {
             "article_count": article_count
         }
 
-        if self.kwargs["order_by"] == "nieuw":
+        order_type = self.kwargs["order_by"]
+
+        if order_type == "nieuw":
             """
             Order by newest first
             """
             article = Article.objects.all().order_by('-created')
 
-        elif self.kwargs["order_by"] == "populair":
+        elif order_type == "populair":
             """
             Order by most likes all time
             """
@@ -45,7 +47,7 @@ class ArticleListView(generic.View):
                 num_likes=Count("user_likes")
             ).order_by("-num_likes")
 
-        elif self.kwargs["order_by"] == "hot":
+        elif order_type == "hot":
             """
             Order by most likes over the TIME_DELTA in days
             """
@@ -58,7 +60,7 @@ class ArticleListView(generic.View):
             return redirect("articles:article-list", "nieuw")
 
         # narrow filter to public only
-        # article = article.filter(is_public=True)
+        article = article.filter(is_public=True)
 
         if request.user.is_authenticated:
             context["logged_in"] = True
@@ -90,6 +92,11 @@ class ArticleDetailView(generic.View):
         context = {
             "article": article,
         }
+
+        if not article.is_public:
+            if article.author != request.user:
+                return redirect("articles:article-list", "nieuw")
+            context["not_public"] = True
 
         # Check to see if the current user is the author of the article
         if request.user.is_authenticated:
