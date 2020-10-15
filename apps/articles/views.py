@@ -18,17 +18,16 @@ from comments.forms import CommentForm
 
 
 TIME_DELTA = 2      # days
+ORDER_TYPES = ["nieuw", "populair", "hot"]
 
 
-def redirect_to_list_view(**kwargs):
+def redirect_to_list_view(order_by=ORDER_TYPES[0]):
     """Redirect to newest first in article-list"""
-    if kwargs["order_by"]:
-        return redirect("articles:article-list", kwargs["order_by"])
-    return redirect("articles:article-list", "nieuw")
+    return redirect("articles:article-list", order_by)
 
 
 @login_required
-def favorite_article(request, *args, **kwargs):
+def favorite_article(request, **kwargs):
     """favorite or unfavorite an article"""
     article = get_object_or_404(Article, slug=kwargs.get("slug"))
     if request.user in article.user_favorites.all():
@@ -39,7 +38,7 @@ def favorite_article(request, *args, **kwargs):
 
 
 @login_required
-def create_comment(request, *args, **kwargs):
+def create_comment(request, **kwargs):
     """
     User created comment
     """
@@ -72,13 +71,13 @@ class ArticleListView(generic.View):
 
         order_type = self.kwargs["order_by"]
 
-        if order_type == "nieuw":
+        if order_type == ORDER_TYPES[0]:
             """
             Order by newest first
             """
             article = Article.objects.all().order_by('-created')
 
-        elif order_type == "populair":
+        elif order_type == ORDER_TYPES[1]:
             """
             Order by most likes all time
             """
@@ -86,7 +85,7 @@ class ArticleListView(generic.View):
                 num_likes=Count("user_likes")
             ).order_by("-num_likes")
 
-        elif order_type == "hot":
+        elif order_type == ORDER_TYPES[2]:
             """
             Order by most likes over the TIME_DELTA in days
             """
@@ -96,7 +95,7 @@ class ArticleListView(generic.View):
             ).order_by("-num_likes")
 
         else:
-            return redirect_to_list_view(order_by="hot")
+            return redirect_to_list_view()
 
         # narrow filter to public only
         article = article.filter(is_public=True)
