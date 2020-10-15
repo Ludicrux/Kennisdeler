@@ -29,6 +29,5 @@ class Comment(TimeStampedModel):
         verbose_name = "Comment"
         verbose_name_plural = "Comments"
 
-
     def __str__(self):
         return f"{self.message}"

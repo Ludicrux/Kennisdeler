@@ -165,7 +165,6 @@ class Favorite(TimeStampedModel):
         verbose_name = "Favoriet"
         verbose_name_plural = "Favorieten"
 
-
     def __str__(self):
         """returns the creation datetime"""
         return f"{self.created}"
