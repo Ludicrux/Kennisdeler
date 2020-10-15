@@ -20,6 +20,42 @@ from comments.forms import CommentForm
 TIME_DELTA = 2      # days
 
 
+def redirect_to_list_view(*args, **kwargs):
+    """Redirect to newest first in article-list"""
+    return redirect("articles:article-list", "nieuw")
+
+
+@login_required
+def favorite_article(request, *args, **kwargs):
+    """favorite or unfavorite an article"""
+    article = get_object_or_404(Article, slug=kwargs.get("slug"))
+    if request.user in article.user_favorites.all():
+        article.user_favorites.remove(request.user)
+    else:
+        article.user_favorites.add(request.user)
+    return redirect(article.get_absolute_url())
+
+
+@login_required
+def create_comment(request, *args, **kwargs):
+    """
+    User created comment
+    """
+    form = CommentForm(request.POST)
+    author = get_object_or_404(User, pk=request.user.id)
+    article = get_object_or_404(Article, slug=kwargs.get("slug"))
+    if request.user == article.author:
+        return redirect(article.get_absolute_url())
+
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = author
+        comment.article = article
+        comment.save()
+
+    return redirect(article.get_absolute_url())
+
+
 class ArticleListView(generic.View):
     """Generic list view for the Article model"""
     model = Article
@@ -57,7 +93,7 @@ class ArticleListView(generic.View):
             ).order_by("-num_likes")
 
         else:
-            return redirect("articles:article-list", "nieuw")
+            return redirect_to_list_view()
 
         # narrow filter to public only
         article = article.filter(is_public=True)
@@ -95,7 +131,7 @@ class ArticleDetailView(generic.View):
 
         if not article.is_public:
             if article.author != request.user:
-                return redirect("articles:article-list", "nieuw")
+                return redirect_to_list_view()
             context["not_public"] = True
 
         # Check to see if the current user is the author of the article
@@ -111,17 +147,6 @@ class ArticleDetailView(generic.View):
             context["article_favorite"] = request.user
 
         return render(request, self.template_name, context)
-
-
-@login_required
-def favorite_article(request, *args, **kwargs):
-    """favorite or unfavorite an article"""
-    article = get_object_or_404(Article, slug=kwargs.get("slug"))
-    if request.user in article.user_favorites.all():
-        article.user_favorites.remove(request.user)
-    else:
-        article.user_favorites.add(request.user)
-    return redirect(article.get_absolute_url())
 
 
 @method_decorator(login_required, name="dispatch")
@@ -171,7 +196,7 @@ class ArticleEditView(generic.View):
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
 
         if not request.user == article.author:
-            return redirect("articles:article-list", "nieuw")
+            return redirect_to_list_view()
 
         form = ArticleForm(instance=article)
         context = {
@@ -187,7 +212,7 @@ class ArticleEditView(generic.View):
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
 
         if not request.user == article.author:
-            return redirect("articles:article-list", "nieuw")
+            return redirect_to_list_view()
 
         form = ArticleForm(
             request.POST or None,
@@ -203,23 +228,3 @@ class ArticleEditView(generic.View):
         }
 
         return render(request, self.template_name, context)
-
-
-@login_required
-def create_comment(request, *args, **kwargs):
-    """
-    User created comment
-    """
-    form = CommentForm(request.POST)
-    author = get_object_or_404(User, pk=request.user.id)
-    article = get_object_or_404(Article, slug=kwargs.get("slug"))
-    if request.user == article.author:
-        return redirect(article.get_absolute_url())
-
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.author = author
-        comment.article = article
-        comment.save()
-
-    return redirect(article.get_absolute_url())

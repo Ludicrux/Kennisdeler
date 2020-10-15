@@ -29,13 +29,14 @@ urlpatterns = [
         views.ArticleDetailView.as_view(),
         name="article-detail"
     ),
+    path("", views.redirect_to_list_view, name="redirect"),
     path(
-        '<order_by>/',
+        "<order_by>/",
         views.ArticleListView.as_view(),
         name="article-list"
         ),
     path(
-        'nieuwekennis',
+        "nieuwekennis",
         views.ArticleCreateView.as_view(),
         name="article-create"
     ),
