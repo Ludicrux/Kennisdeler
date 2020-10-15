@@ -20,8 +20,10 @@ from comments.forms import CommentForm
 TIME_DELTA = 2      # days
 
 
-def redirect_to_list_view(*args, **kwargs):
+def redirect_to_list_view(**kwargs):
     """Redirect to newest first in article-list"""
+    if kwargs["order_by"]:
+        return redirect("articles:article-list", kwargs["order_by"])
     return redirect("articles:article-list", "nieuw")
 
 
@@ -62,6 +64,7 @@ class ArticleListView(generic.View):
     template_name = "articles/article_list.html"
 
     def get(self, request, *args, **kwargs):
+        """Filtered list views"""
         article_count = Article.objects.filter(is_public=True).count()
         context = {
             "article_count": article_count
@@ -93,7 +96,7 @@ class ArticleListView(generic.View):
             ).order_by("-num_likes")
 
         else:
-            return redirect_to_list_view()
+            return redirect_to_list_view(order_by="hot")
 
         # narrow filter to public only
         article = article.filter(is_public=True)
