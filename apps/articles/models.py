@@ -10,8 +10,6 @@ from django_extensions.db.models import TimeStampedModel
 from django_extensions.db.fields import AutoSlugField
 from django_resized import ResizedImageField
 
-from lib.images import Imaging
-
 
 LEVEL_CHOICES = [
     (1, "Niveau 1"),
