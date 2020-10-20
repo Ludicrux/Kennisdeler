@@ -2,13 +2,15 @@
 """
 Forms for articles
 """
-from django.forms import ModelForm
+from django import forms 
 # from django.forms import ClearableFileInput
-
 from articles.models import Article
 
 
-class ArticleForm(ModelForm):
+class ArticleFormPage1(forms.ModelForm):
+    your_name = forms.CharField(label='Your name', max_length=100)
+
+class ArticleForm(forms.ModelForm):
     """
     Create or update an article
     """
