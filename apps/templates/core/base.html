@@ -1,23 +1,32 @@
+{% load static %}
+
+<head>
+  <link rel="stylesheet" type="text/css" href="{% static 'core/css/styles.css'%}">
+</head>
+<body>
 {% block navbar %}
-
-<a href="{% url 'core:homepage' %}">Home</a> \ \ \ \ \ 
-<a href="{% url 'articles:article-list' 'nieuw' %}">KennisBank</a> \ \ \ \ \ 
-{% if user.is_authenticated %}
-     <a href="{% url 'articles:article-create' %}"><b>+</b>TOEVOEGEN</a> \ \ \ \ \
-{% endif %}
-ZOEKEN <br><br>
-{% if user.is_authenticated %}
-    Ingelogd als: <b>{{ user.get_username }}</b> \ \ \ \ \ 
-    <a href="{% url 'logout' %}">Uitloggen </a> \ \ \ \ \
-    <a href="{% url 'comments:comment-list' %}">Bedankjes</a><br>
-{% else %}
-    <li><a href="{% url 'login' %}">Inloggen</a></li>
-{% endif %}
-<br>
-
-
+    <div class="navbar">
+        <div class="navbaritems">
+            <a href="{% url 'core:homepage' %}">Home</a>
+            <a href="{% url 'articles:article-list' 'nieuw' %}">KennisBank</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'articles:article-create' %}"><b>+</b>TOEVOEGEN</a>
+            {% endif %}
+            ZOEKEN
+        </div>
+        <div class="navbaritems">
+            {% if user.is_authenticated %}
+                Ingelogd als: <b>{{ user.get_username }}
+                <a href="{% url 'logout' %}">Uitloggen </a>
+                <a href="{% url 'comments:comment-list' %}">Bedankjes</a>
+            {% else %}
+                <li><a href="{% url 'login' %}">Inloggen</a></li>
+            {% endif %}
+        </div>
+    </div>
 <br>
 {% endblock %}
 
 
 {% block content %} {% endblock %}
+</body>

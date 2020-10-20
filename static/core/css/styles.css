@@ -1,0 +1,112 @@
+div {
+    display: block;
+}
+
+body {
+    background-color: rgb(252, 252, 243);
+}
+
+.col-side {
+    width: 25%;
+    position: relative;
+}
+
+.col-main {
+    width: 72%; 
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.tag-item {
+    float: left;
+    margin: 4px;
+    padding: 5px;
+    background-color: lightsteelblue;
+    border-radius: 25px;
+
+}
+
+.col-top {
+    margin-bottom: 40px;
+    padding: 10px;
+}
+
+.container {
+    padding: 5%;
+    margin: 5px;
+}
+
+#left {
+    float: left;
+}
+
+#right {
+    float: right;
+}
+
+#sticky {
+    position: -webkit-sticky;
+    position: sticky;
+}
+
+.navbar {
+    position: -webkit-sticky;
+    position: sticky;
+    background-color: blanchedalmond;
+    top: 0;
+    padding: 5px;
+    height: 2%;
+}
+
+.navbaritems {
+    float: right;
+}
+
+.navbaritems a {
+    padding: 10px;
+}
+
+.kennisbank {
+    padding: 20px;
+}
+
+.filter {
+    padding: 10px;
+    margin: 20px;
+}
+
+.kennisbank-top {
+    margin: 20px;
+    padding: 20px;
+    background-color: bisque;
+}
+
+.sort {
+    background-color: antiquewhite;
+    margin: 20px;
+    padding: 1%;
+    columns: 3;
+}
+.orderby {
+    width: 33%;
+}
+
+.kennisbank-qs {
+    columns: 2;
+    margin: 20px;
+    padding: 10px;
+}
+.kennisbank-qs-item {
+    padding: 10px;
+    margin: 20px;
+}
+
+.main-image {
+    padding: 15px;
+    align-content: center;
+}
+
+.content {
+    padding: 15px;
+}
+

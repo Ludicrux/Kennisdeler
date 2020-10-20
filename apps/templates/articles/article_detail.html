@@ -1,50 +1,102 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-        {% if article_author %}
-            <a href="{{ article.get_absolute_url_edit }}">Bewerk kennis</a><br>
-        {% endif %}
-        {% if not_public %}
-            KENNIS STAAT OP PRIVÉ <br>
-        {% endif %}
-    <h1>{{ article.title }}</h1>
-    <div>
-        {{ article.short_desc }} <br>
-        {{ article.created|date }} <br>
-        <img src="{{ article.image.url }}">
+<div class="container">
+    <div class="col-top">
+    
+        <div class="edit">
+            {% if article_author %}
+                <a href="{{ article.get_absolute_url_edit }}">Bewerk kennis</a>
+            {% endif %}
+            {% if not_public %}
+                KENNIS STAAT OP PRIVÉ
+            {% endif %}
+        </div>
+        <div class="kennis-top">
+            <div class="row">
+                <h1>{{ article.title }}</h1>
+            </div>
+            <div class="row">
+                {{ article.short_desc }} / {{ article.created|date }} <br>
+            </div>
+            <div class="row" id="right">
+             <!--Move to views -->
+                {% if article_favorite %}
+                    <a href="{% url 'articles:article-favorite' slug=article.slug %}">Unfavorite</a>
+                {% else %}
+                    <a href="{% url 'articles:article-favorite' slug=article.slug %}">Favorite</a>
+                {% endif %}
+                | Like
+            </div>
+        </div>
     </div>
-        {{ article.long_desc }}<br>
-    File here
-    <div>
-        
-            {{ article.subject }}
-    </div>
-    <div>
-        {{ article.author }}
-        {{ article.views }}X bekeken / {{ article.downloads }}X gedownload
-    </div>
-    <div>
-        DOWNLOADEN     DELEN
-        Like
-        {% if article_favorite %}
-            <a href="{% url 'articles:article-favorite' slug=article.slug %}">Unfavorite</a>
-        {% else %}
-            <a href="{% url 'articles:article-favorite' slug=article.slug %}">Favorite</a>
-        {% endif %}
-    </div>
-    <div>
-        {% if comment_form %}
-        STUUR EEN PERSOONLIJK BEDANKJE
-        <form action="{% url 'articles:article-comment' slug=article.slug %}" method="post">
-            {% csrf_token %}
-            {{ comment_form.as_p }}
-        <input type="submit" value="Submit">
-        {% endif %}
-    </form>
-    </div>
-    <div>
-        Hier is iets niet in orde
-    </div>
-    VERGELIJKBAAR
 
+    <div class="col-main" id="left" style="background-color: beige; min-height: 500px;">
+        <div class="main-image">
+            <img src="{{ article.image.url }}">
+        </div>
+        <div class="content">
+            <p>{{ article.long_desc }}</p>
+        </div>
+        <div class="content">
+            <div class="tag-item">
+                {{ article.subject }}
+            </div>
+            {% if article.tags %}
+                {% for tag in article.tags.all %}
+                    <div class="tag-item">
+                        {{ tag }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="tag-item">
+                level {{ level }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-side" id="right">
+        <div class="content" style="background-color:beige; margin:2%;">
+            <div> 
+                {{ article.author }} 
+            </div>
+            <div>
+                {{ article.views }}X bekeken / {{ article.downloads }}X gedownload
+            </div>
+        </div>
+        <div class="content" style="columns:2">
+            <div style="float: left; background-color:beige; padding:5%;">
+                DOWNLOADEN
+            </div>
+            <div style="float: left; background-color:beige; padding:5%;">
+                DELEN
+            </div>
+        </div>
+        <div class="content" style="background-color:beige; margin: 2%;">
+        <!--Move to views -->
+            {% if article_favorite %}
+                <a href="{% url 'articles:article-favorite' slug=article.slug %}">Unfavorite</a>
+            {% else %}
+                <a href="{% url 'articles:article-favorite' slug=article.slug %}">Favorite</a>
+            {% endif %}
+            LIKE
+        </div>
+        <div class="content" style="background-color:beige; min-height:200px; margin: 2%;">
+            {% if comment_form %}
+            STUUR EEN PERSOONLIJK BEDANKJE
+            <form action="{% url 'articles:article-comment' slug=article.slug %}" method="post">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <input type="submit" value="Submit">
+            </form>
+            {% endif %}
+        </div>
+            <div>
+                Hier is iets niet in orde
+            </div>
+        </div>
+    </div>
+        <!-- VERGELIJKBAAR -->
+    </div>
+</div>
 {% endblock %}
