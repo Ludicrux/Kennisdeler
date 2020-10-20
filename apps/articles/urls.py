@@ -5,13 +5,18 @@ url: /kennisbank/
 from django.urls import path
 
 from articles import views
+from articles.forms import ArticleFormPage1, ArticleFormPage2
 
 
 app_name = "articles"
 urlpatterns = [
-    path("", views.redirect_to_list_view, name="redirect"),
     path(
-        "<order_by>/",
+        "",
+        views.redirect_to_list_view,
+        name="article-list-redirect"
+    ),
+    path(
+        "<order_by>",
         views.ArticleListView.as_view(),
         name="article-list"
         ),
@@ -36,8 +41,13 @@ urlpatterns = [
         name="article-detail"
     ),
     path(
-        "nieuwekennis",
-        views.ArticleCreateView.as_view(),
+        "nieuwekennis/page<int:num>",
+        views.ArticleCreateView.as_view([ArticleFormPage1, ArticleFormPage2]),
+        name="article-create-page"
+    ),
+    path(
+        "nieuwekennis/",
+        views.ArticleCreateView.as_view([ArticleFormPage1, ArticleFormPage2]),
         name="article-create"
     ),
 ]

@@ -2,13 +2,59 @@
 """
 Forms for articles
 """
-from django import forms 
+from django import forms
 # from django.forms import ClearableFileInput
-from articles.models import Article
+from articles.models import Article, Subject
 
 
 class ArticleFormPage1(forms.ModelForm):
-    your_name = forms.CharField(label='Your name', max_length=100)
+    title = forms.CharField(label='Titel', max_length=120)
+    short_desc = forms.CharField(label="Korte omschrijving", max_length=120)
+    image = forms.ImageField(label="Upload afbeelding")
+    long_desc = forms.CharField(
+        label="Geef hier een lange beschrijving (optioneel)",
+        widget=forms.Textarea
+    )
+    uploaded_file = forms.FileField(
+        label="Upload hier je bestanden (optioneel"
+    )
+
+    class Meta:
+        model = Article
+        fields = [
+            'title',
+            'short_desc',
+            'image',
+            'long_desc',
+            "uploaded_file",
+        ]
+
+
+class ArticleFormPage2(forms.ModelForm):
+    subject = forms.ModelChoiceField(
+        label="Opleiding",
+        queryset=Subject.objects.all(),
+    )
+    level = forms.IntegerField(
+        label="Niveau"
+    )
+    file_type = forms.CharField(
+        label="Soort document"
+    )
+    is_public = forms.BooleanField(label="Openbaar")
+
+    class Meta:
+        model = Article
+        fields = [
+            'subject',
+            'level',
+            'file_type',
+            'is_public',
+        ]
+        exclude = [
+            "author"
+        ]
+
 
 class ArticleForm(forms.ModelForm):
     """

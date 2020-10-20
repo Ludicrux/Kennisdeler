@@ -10,11 +10,15 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 from articles.models import Article
 from articles.filters import ArticleFilter
-from articles.forms import ArticleForm
+from articles.forms import ArticleForm, ArticleFormPage1, ArticleFormPage2
 from comments.forms import CommentForm
+
+from formtools.wizard.views import SessionWizardView
 
 
 TIME_DELTA = 2      # days
@@ -23,7 +27,7 @@ ORDER_TYPES = ["nieuw", "populair", "hot"]
 
 def redirect_to_list_view(order_by=ORDER_TYPES[0]):
     """Redirect to newest first in article-list"""
-    return redirect("articles:article-list", order_by)
+    return redirect("articles:article-list")
 
 
 @login_required
@@ -62,22 +66,20 @@ class ArticleListView(generic.View):
     model = Article
     template_name = "articles/article_list.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, order_by=ORDER_TYPES[0], **kwargs):
         """Filtered list views"""
         article_count = Article.objects.filter(is_public=True).count()
         context = {
             "article_count": article_count
         }
 
-        order_type = self.kwargs["order_by"]
-
-        if order_type == ORDER_TYPES[0]:
+        if order_by == ORDER_TYPES[0]:
             """
             Order by newest first
             """
             article = Article.objects.all().order_by('-created')
 
-        elif order_type == ORDER_TYPES[1]:
+        elif order_by == ORDER_TYPES[1]:
             """
             Order by most likes all time
             """
@@ -85,7 +87,7 @@ class ArticleListView(generic.View):
                 num_likes=Count("user_likes")
             ).order_by("-num_likes")
 
-        elif order_type == ORDER_TYPES[2]:
+        elif order_by == ORDER_TYPES[2]:
             """
             Order by most likes over the TIME_DELTA in days
             """
@@ -95,7 +97,7 @@ class ArticleListView(generic.View):
             ).order_by("-num_likes")
 
         else:
-            return redirect_to_list_view()
+            return redirect("articles:article-list", ORDER_TYPES[0])
 
         # narrow filter to public only
         article = article.filter(is_public=True)
@@ -152,12 +154,12 @@ class ArticleDetailView(generic.View):
 
 
 @method_decorator(login_required, name="dispatch")
-class ArticleCreateView(generic.View):
+class ArticleCreateView(SessionWizardView):
     """Creation view for Article"""
-    model = Article
     template_name = "articles/article_create.html"
+    file_storage = FileSystemStorage(location=settings.MEDIA_URL)
 
-    def get(self, request, *args, **kwargs):
+    '''def get(self, request, **kwargs):
         """
         Render the creation view for Article
         """
@@ -171,6 +173,7 @@ class ArticleCreateView(generic.View):
     def post(self, request, *args, **kwargs):
         """save the form to the Article model database"""
         form = ArticleForm(request.POST, request.FILES)
+        
         if form.is_valid():
             article = form.save(commit=False)
             article.author = get_object_or_404(User, pk=request.user.id)
@@ -181,7 +184,22 @@ class ArticleCreateView(generic.View):
             "form": form
         }
 
-        return render(request, self.template_name, context)
+        return render(request, self.template_name, context)'''
+
+    def get_form(self, step=None, data=None, files=None):
+        form = super().get_form(step, data, files)
+
+        if step is None:
+            step = self.steps.current
+
+        if step == "2":
+            form.author= self.request.user
+
+        return form
+
+    def done(self, form_list, **kwargs):
+        context = {"form_data": [form.cleaned_data for form in form_list]}
+        return render(self.request, self.template_name, context)
 
 
 @method_decorator(login_required, name="dispatch")
