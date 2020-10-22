@@ -69,8 +69,7 @@ class ArticleListView(generic.View):
 
     def get(self, request, order_by=ORDER_TYPES[0], **kwargs):
         """Filtered list views"""
-        context = {
-        }
+        context = {}
 
         if order_by == ORDER_TYPES[0]:
             """
@@ -111,6 +110,16 @@ class ArticleListView(generic.View):
         if "favorite" in request.GET:
             context["favorite_selected"] = True
             article = article.filter(user_favorites=request.user)
+
+        # filter on search
+        if "search" in request.GET:
+            context["search_str"] = request.GET["search"]
+            article = article.filter(
+                Q(title__icontains=context["search_str"]) |
+                Q(author__username__icontains=context["search_str"]) |
+                Q(short_desc__icontains=context["search_str"]) |
+                Q(long_desc__icontains=context["search_str"])
+            )
 
         article_filter = ArticleFilter(
             request.GET,

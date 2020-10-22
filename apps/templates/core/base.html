@@ -12,7 +12,10 @@
             {% if user.is_authenticated %}
                 <a href="{% url 'articles:article-create' %}"><b>+</b>TOEVOEGEN</a>
             {% endif %}
-            ZOEKEN
+            <form method="get" action="{% url 'articles:article-list' order_by='nieuw'%}">
+                <input type="text" id="search" name="search"></input>
+                <button type="submit">Zoeken</button>
+            </form>
         </div>
         <div class="navbaritems">
             {% if user.is_authenticated %}

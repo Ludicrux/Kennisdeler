@@ -11,6 +11,7 @@ class ArticleFilter(django_filters.FilterSet):
     """
     Filter for article list
     """
+
     subject = django_filters.ModelChoiceFilter(
         queryset=Subject.objects.all(),
         label="Opleiding"

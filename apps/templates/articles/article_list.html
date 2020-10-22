@@ -17,8 +17,9 @@
                         <option value="True"></option>
                     </input>
                 {% endif %}
+                <input type="text" id="search" name="search"></input>
                 {{ article_list.form.as_p }}
-                <button type="submit">Search</button>
+                <button type="submit">Zoeken</button>
             </form>
         </div>
     </div>
@@ -36,6 +37,11 @@
             </div>
         
         <div class="kennisbank-qs" style="background-color: beige;">
+        {% if search_str %}
+            <div>
+            Zoeken op: {{ search_str }}
+            </div>
+        {% endif %}
             {% for article in article_list.qs %}
                 <div class="kennisbank-qs-item">
                     <!-- <img src="{{ article.image.url }}"> -->
