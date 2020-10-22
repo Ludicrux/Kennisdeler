@@ -1,6 +1,7 @@
 """
 Views for Articles
 """
+from pathlib import Path
 from datetime import date, timedelta
 
 from django.views import generic
@@ -15,7 +16,7 @@ from django.core.files.storage import FileSystemStorage
 
 from articles.models import Article
 from articles.filters import ArticleFilter
-from articles.forms import ArticleForm, ArticleFormPage1, ArticleFormPage2
+from articles.forms import ArticleForm
 from comments.forms import CommentForm
 
 from formtools.wizard.views import SessionWizardView
@@ -68,9 +69,7 @@ class ArticleListView(generic.View):
 
     def get(self, request, order_by=ORDER_TYPES[0], **kwargs):
         """Filtered list views"""
-        article_count = Article.objects.filter(is_public=True).count()
         context = {
-            "article_count": article_count
         }
 
         if order_by == ORDER_TYPES[0]:
@@ -100,10 +99,14 @@ class ArticleListView(generic.View):
             return redirect("articles:article-list", ORDER_TYPES[0])
 
         # narrow filter to public only
-        article = article.filter(is_public=True)
-
         if request.user.is_authenticated:
             context["logged_in"] = True
+            context["article_count"] = Article.objects.all().count()
+        else:
+            article = article.filter(is_public=False)
+            context["article_count"] = Article.objects.filter(
+                is_public=False
+            ).count()
 
         if "favorite" in request.GET:
             context["favorite_selected"] = True
@@ -134,8 +137,6 @@ class ArticleDetailView(generic.View):
         }
 
         if not article.is_public:
-            if article.author != request.user:
-                return redirect_to_list_view()
             context["not_public"] = True
 
         # Check to see if the current user is the author of the article
@@ -148,7 +149,9 @@ class ArticleDetailView(generic.View):
 
         # Check if the user favorited the post
         if request.user in article.user_favorites.all():
-            context["article_favorite"] = request.user
+            context["article_favorite"] = "Favorite"
+        else:
+            context["article_favorite"] = "Unfavorite"
 
         return render(request, self.template_name, context)
 
@@ -157,49 +160,21 @@ class ArticleDetailView(generic.View):
 class ArticleCreateView(SessionWizardView):
     """Creation view for Article"""
     template_name = "articles/article_create.html"
-    file_storage = FileSystemStorage(location=settings.MEDIA_URL)
-
-    '''def get(self, request, **kwargs):
-        """
-        Render the creation view for Article
-        """
-        form = ArticleForm()
-        context = {
-            "form": form
-        }
-
-        return render(request, self.template_name, context)
-
-    def post(self, request, *args, **kwargs):
-        """save the form to the Article model database"""
-        form = ArticleForm(request.POST, request.FILES)
-        
-        if form.is_valid():
-            article = form.save(commit=False)
-            article.author = get_object_or_404(User, pk=request.user.id)
-            article.save()
-            return redirect(article.get_absolute_url())
-
-        context = {
-            "form": form
-        }
-
-        return render(request, self.template_name, context)'''
-
-    def get_form(self, step=None, data=None, files=None):
-        form = super().get_form(step, data, files)
-
-        if step is None:
-            step = self.steps.current
-
-        if step == "2":
-            form.author= self.request.user
-
-        return form
+    file_storage = FileSystemStorage(
+        location=Path(settings.MEDIA_ROOT).joinpath('temp')
+    )
 
     def done(self, form_list, **kwargs):
-        context = {"form_data": [form.cleaned_data for form in form_list]}
-        return render(self.request, self.template_name, context)
+        temp = []
+        for form in form_list:
+            temp.append(form.cleaned_data)
+        form_dict = temp[0]
+        form_dict.update(temp[1])
+        form_dict["author"] = get_object_or_404(User, pk=self.request.user.id)
+        article = Article(**form_dict)
+        article.save()
+
+        return redirect(article.get_absolute_url())
 
 
 @method_decorator(login_required, name="dispatch")

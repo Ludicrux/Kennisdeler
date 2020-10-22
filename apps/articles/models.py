@@ -28,6 +28,11 @@ FILE_TYPE_CHOICES = [
     ("NVT", "N.v.t."),
 ]
 
+PUBLIC_SETTING_CHOICES = [
+    (1, "Iedereen mag dit zien"),
+    (0, "Alleen voor leden op dit platform")
+]
+
 
 class Subject(TimeStampedModel):
     """Subjects used for the article"""
@@ -98,7 +103,10 @@ class Article(TimeStampedModel):
     file_type = models.CharField(
         max_length=3, choices=FILE_TYPE_CHOICES, default="3DB"
     )
-    is_public = models.BooleanField(default=False)
+    is_public = models.IntegerField(
+        default=1,
+        choices=PUBLIC_SETTING_CHOICES,
+    )
     views = models.IntegerField(default=0)
     downloads = models.IntegerField(default=0)
     user_favorites = models.ManyToManyField(

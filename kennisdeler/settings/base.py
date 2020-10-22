@@ -132,7 +132,7 @@ STATICFILES_DIRS = [
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = Path(BASE_DIR).joinpath('media')
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 
 CONTEXT_PROCESSORS = [
