@@ -95,4 +95,23 @@ class Migration(migrations.Migration):
             name='user_likes',
             field=models.ManyToManyField(blank=True, related_name='user_likes', through='articles.Like', to=settings.AUTH_USER_MODEL),
         ),
+        migrations.CreateModel(
+            name='Favorite',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
+                ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='articles.Article')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'get_latest_by': 'modified',
+                'abstract': False,
+            },
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='user_favorites',
+            field=models.ManyToManyField(blank=True, related_name='user_favorites', through='articles.Favorite', to=settings.AUTH_USER_MODEL),
+        ),
     ]

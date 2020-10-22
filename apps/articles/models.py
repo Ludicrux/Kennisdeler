@@ -8,8 +8,7 @@ from django.shortcuts import reverse
 
 from django_extensions.db.models import TimeStampedModel
 from django_extensions.db.fields import AutoSlugField
-
-from lib.images import Imaging
+from django_resized import ResizedImageField
 
 
 LEVEL_CHOICES = [
@@ -33,26 +32,33 @@ FILE_TYPE_CHOICES = [
 class Subject(TimeStampedModel):
     """Subjects used for the article"""
     name = models.CharField(max_length=25, unique=True)
-    image = models.ImageField(upload_to="images/subject-images/")
+    image = ResizedImageField(
+        quality=100,
+        size=[300, 300],
+        upload_to="images/subject-images",
+    )
+
+    class Meta:
+        """META"""
+        verbose_name = "Opleiding"
+        verbose_name_plural = "Opleidingen"
 
     def __str__(self):
+        """Returns name stirng"""
         return f"{self.name}"
-
-    def save(self, *args, **kwargs):
-        """save function override"""
-        # Image resizing
-        img = Imaging(self.image)
-        img.resize_by_max(new_height=300)
-        self.image = img.save_image()
-
-        super().save(*args, **kwargs)
 
 
 class Tag(TimeStampedModel):
     """Tags used for article"""
     name = models.CharField(max_length=25, unique=True)
 
+    class Meta:
+        """META"""
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"
+
     def __str__(self):
+        """Returns name stirng"""
         return f"{self.name}"
 
 
@@ -63,13 +69,21 @@ class Article(TimeStampedModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     short_desc = models.CharField(max_length=120)
     long_desc = models.TextField(max_length=1500, blank=True)
-    image = models.ImageField(
+    image = ResizedImageField(
+        quality=100,
+        size=[1000, 500],
         upload_to="images/article-images",
-        verbose_name="articleimg"
+    )
+    thumb = ResizedImageField(
+        quality=100,
+        size=[40, 40],
+        crop=["middle", "center"],
+        blank=True,
+        upload_to="images/article-thumbnail",
     )
     uploaded_file = models.FileField(
         upload_to="documents/article-documents",
-        verbose_name="articledoc"
+        blank=True
     )
     user_likes = models.ManyToManyField(
         User, blank=True, through="Like", related_name="user_likes"
@@ -100,7 +114,7 @@ class Article(TimeStampedModel):
         verbose_name_plural = "Artikelen"
 
     def __str__(self):
-        """return the title"""
+        """return the string title"""
         return f"{self.title}"
 
     def get_absolute_url(self):
@@ -117,20 +131,16 @@ class Article(TimeStampedModel):
             kwargs={'slug': str(self.slug)}
         )
 
-    def save(self, *args, **kwargs):
-        """save function override"""
-        # image resizing
-        img = Imaging(self.image)
-        img.resize_by_max(new_width=700)
-        self.image = img.save_image()
-
-        super().save(*args, **kwargs)
-
 
 class Like(TimeStampedModel):
     """Model to filter the article by popularity"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    class Meta:
+        """META"""
+        verbose_name = "Like"
+        verbose_name_plural = "Likes"
 
     def __str__(self):
         """returns the creation datetime"""
@@ -141,6 +151,11 @@ class Favorite(TimeStampedModel):
     """Model to allow sorting of favorites by most recent"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    class Meta:
+        """META"""
+        verbose_name = "Favoriet"
+        verbose_name_plural = "Favorieten"
 
     def __str__(self):
         """returns the creation datetime"""

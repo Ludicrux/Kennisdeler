@@ -3,27 +3,30 @@
 {% block content %}
 <h1>Kennisbank</h1>
 sorteren op:<br>
-<a href="{% url 'articles:article-list' order_by='nieuw' %}"> nieuw / </a>
-<a href="{% url 'articles:article-list' order_by='populair' %}"> populair / </a>
-<a href="{% url 'articles:article-list' order_by='hot' %}"> hot </a> <br> 
+    <a href="{% url 'articles:article-list' order_by='nieuw' %}"> nieuw / </a>
+    <a href="{% url 'articles:article-list' order_by='populair' %}"> populair / </a>
+    <a href="{% url 'articles:article-list' order_by='hot' %}"> hot </a> <br> 
 {{ article_list.qs.count }} gevonden van {{ article_count }} totaal <br>
 
 <form method="get">
-    <label for="favorite">Favorieten:</label>
-    <input 
-        {% if favorite_selected %}
-            checked
-        {% endif %}
-    type="checkbox" id="favorite" name="favorite"
-    >
-        <option value="True"></option>
-    </input>
+    {% if logged_in %}
+        <label for="favorite">Favorieten:</label>
+        <input
+            {% if favorite_selected %}
+                checked
+            {% endif %}
+            type="checkbox" id="favorite" name="favorite"
+            >
+            <option value="True"></option>
+        </input>
+    {% endif %}
     {{ article_list.form.as_p }}
     <button type="submit">Search</button>
 </form>
 <br>
-{{ fav_test }}
+
 {% for article in article_list.qs %}
+    <img src="{{ article.image.url }}">
     <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> <br>
     {{ article.created|date}} {{ article.user_likes.count }} likes <br>
     {{ article.short_desc }} <br>

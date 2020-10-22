@@ -9,6 +9,12 @@ from articles import views
 
 app_name = "articles"
 urlpatterns = [
+    path("", views.redirect_to_list_view, name="redirect"),
+    path(
+        "<order_by>/",
+        views.ArticleListView.as_view(),
+        name="article-list"
+        ),
     path(
         "kennis/<slug:slug>/bewerken",
         views.ArticleEditView.as_view(),
@@ -16,12 +22,12 @@ urlpatterns = [
     ),
     path(
         "kennis/<slug:slug>/favorite",
-        views.FavoriteArticle,
+        views.favorite_article,
         name="article-favorite"
     ),
     path(
         "kennis/<slug:slug>/comment",
-        views.CreateComment,
+        views.create_comment,
         name="article-comment"
     ),
     path(
@@ -30,12 +36,7 @@ urlpatterns = [
         name="article-detail"
     ),
     path(
-        '<order_by>/',
-        views.ArticleListView.as_view(),
-        name="article-list"
-        ),
-    path(
-        'nieuwekennis',
+        "nieuwekennis",
         views.ArticleCreateView.as_view(),
         name="article-create"
     ),

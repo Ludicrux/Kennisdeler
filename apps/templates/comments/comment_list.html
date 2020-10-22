@@ -5,7 +5,8 @@
 {% for comment in comment_list %}
     {{ comment.author }}<br>
     om: {{ comment.created }}<br>
-    Op jouw kennis: {{ comment.article }} <br>
+    Op jouw kennis: <a href="{{ comment.article.get_absolute_url }}">{{ comment.article }}</a><br>
+    
     {{ comment.message }}<br><br>
 {% endfor %}
 {% endblock %}
