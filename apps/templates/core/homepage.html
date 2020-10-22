@@ -4,7 +4,7 @@
 <h1> OPLEIDINGEN </h1>
 <br>
 {% for subject in subject_list %}
-    <a href="{% url 'articles:article-list' order_by='hot' %}?subject={{subject.id}}"> {{ subject.name }}</a><br>
+    <a href="{% url 'articles:article-list' order_by='nieuw' page=1 %}?subject={{subject.id}}"> {{ subject.name }}</a><br>
     <img src="{{ subject.image.url }}"><br>
 {% endfor %}
 {% endblock %}

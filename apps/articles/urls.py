@@ -11,12 +11,7 @@ from articles.forms import ArticleFormPage1, ArticleFormPage2
 app_name = "articles"
 urlpatterns = [
     path(
-        "",
-        views.redirect_to_list_view,
-        name="article-list-redirect"
-    ),
-    path(
-        "<order_by>",
+        "<str:order_by>/pagina<int:page>/",
         views.ArticleListView.as_view(),
         name="article-list"
         ),
@@ -41,7 +36,7 @@ urlpatterns = [
         name="article-detail"
     ),
     path(
-        "nieuwekennis/page<int:num>",
+        "nieuwekennis/pagina<int:num>",
         views.ArticleCreateView.as_view([ArticleFormPage1, ArticleFormPage2]),
         name="article-create-page"
     ),

@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from django.core.paginator import Paginator
 
 from articles.models import Article
 from articles.filters import ArticleFilter
@@ -67,9 +68,10 @@ class ArticleListView(generic.View):
     model = Article
     template_name = "articles/article_list.html"
 
-    def get(self, request, order_by=ORDER_TYPES[0], **kwargs):
+    def get(self, request, order_by=ORDER_TYPES[0], page=1, **kwargs):
         """Filtered list views"""
         context = {}
+        context["current_order"] = str(order_by)
 
         if order_by == ORDER_TYPES[0]:
             """
@@ -93,9 +95,6 @@ class ArticleListView(generic.View):
             article = Article.objects.annotate(
                 num_likes=Count("user_likes", filter=Q(created__gte=last_week))
             ).order_by("-num_likes")
-
-        else:
-            return redirect("articles:article-list", ORDER_TYPES[0])
 
         # narrow filter to public only
         if request.user.is_authenticated:
@@ -121,12 +120,32 @@ class ArticleListView(generic.View):
                 Q(long_desc__icontains=context["search_str"])
             )
 
+        url_path = request.get_full_path()
+        get_ext = ""
+        if "?" in url_path:
+            get_ext = url_path.split("?")[-1]
+            get_ext = f"?{get_ext}"
+        context["get_string"] = get_ext
+
         article_filter = ArticleFilter(
             request.GET,
             queryset=article,
             request=request
         )
-        context["article_list"] = article_filter
+        context["article_filter"] = article_filter
+
+        paginator = Paginator(article_filter.qs, 6)
+        article_list = paginator.get_page(page)
+        context["article_list"] = article_list
+
+        order_types = []
+        for otype in ORDER_TYPES:
+            if otype == context["current_order"]:
+                order_types.append({"name": otype, "current": "red"})
+            else:
+                order_types.append({"name": otype, "current": ""})
+
+        context["order_by"] = order_types
 
         return render(request, self.template_name, context)
 

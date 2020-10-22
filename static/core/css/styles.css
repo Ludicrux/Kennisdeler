@@ -84,17 +84,19 @@ body {
 .sort {
     background-color: antiquewhite;
     margin: 20px;
-    padding: 1%;
     columns: 3;
 }
 .orderby {
     width: 33%;
+    height: 20px;
+    text-align: center;
+    padding: 10px;
 }
 
 .kennisbank-qs {
-    columns: 2;
     margin: 20px;
     padding: 10px;
+    min-height: 80%
 }
 .kennisbank-qs-item {
     padding: 10px;

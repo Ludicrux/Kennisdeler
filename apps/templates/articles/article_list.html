@@ -4,6 +4,7 @@
 <div class="container">
     <div class="col-side" id="left" style="background-color: beige; height: 80%;">
         <div class="filter">
+            <a href="{% url 'articles:article-list' order_by=current_order page=article_list.number %}">Wis</a>
             <h2>FILTER OP:</h2>
             <form method="get">
                 {% if logged_in %}
@@ -18,7 +19,7 @@
                     </input>
                 {% endif %}
                 <input type="text" id="search" name="search"></input>
-                {{ article_list.form.as_p }}
+                {{ article_filter.form.as_p }}
                 <button type="submit">Zoeken</button>
             </form>
         </div>
@@ -26,24 +27,25 @@
     <div class="col-main" id="right">
         <div class="kennisbank-top">
             <h1>Kennisbank</h1>
-            {{ article_list.qs.count }} gevonden van {{ article_count }} totaal
+            {{ article_filter.qs.count }} gevonden van {{ article_count }} totaal
             
         </div>
 
             <div class="sort">
-                    <div class="orderby"> <a href="{% url 'articles:article-list' order_by='nieuw' %}"> nieuw</a> </div>
-                    <div class="orderby"> <a href="{% url 'articles:article-list' order_by='populair' %}"> populair</a> </div>
-                    <div class="orderby"> <a href="{% url 'articles:article-list' order_by='hot' %}"> hot </a> </div>
+                {% for type in order_by %}
+                    <div class="orderby" style="background-color:{{type.current}};"> <a href="{% url 'articles:article-list' order_by=type.name page=article_list.number %}{{ get_string }}"> {{ type.name }}</a> </div>
+                {% endfor %}
             </div>
         
-        <div class="kennisbank-qs" style="background-color: beige;">
-        {% if search_str %}
-            <div>
-            Zoeken op: {{ search_str }}
-            </div>
-        {% endif %}
-            {% for article in article_list.qs %}
-                <div class="kennisbank-qs-item">
+        <div class="kennisbank-qs" style="background-color: beige; min-height: 62%;">
+            {% if search_str %}
+                <div>
+                Resultaten voor: {{ search_str }}
+                </div>
+            {% endif %}
+            <div style="column: 2;">
+            {% for article in article_list %}
+                <div class="kennisbank-qs-item" style="float: left; width:45%; height:20%;">
                     <!-- <img src="{{ article.image.url }}"> -->
                     <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> 
                     {{ article.created|date}} {{ article.user_likes.count }} likes <br>
@@ -54,6 +56,25 @@
             {% empty %}
                 Geen kennis gevonden.
             {% endfor %}
+            </div>
+
+            <div class="Pagination" style="float: right; width: 90%;">
+                <span class="step-links">
+                    {% if article_list.has_previous %}
+                        <a href="{% url 'articles:article-list' order_by=current_order page=1 %}{{ get_string }}">Eerste pagina </a> |
+                        <a href="{% url 'articles:article-list' order_by=current_order page=article_list.previous_page_number %}{{ get_string }}"> Vorige pagina</a>
+                    {% endif %}
+
+                    <span class="current">
+                        || Pagina {{ article_list.number }} van {{ article_list.paginator.num_pages }}. ||
+                    </span>
+
+                    {% if article_list.has_next %}
+                    <a href="{% url 'articles:article-list' order_by=current_order page=article_list.next_page_number %}{{ get_string }}">Volgende pagina</a> |
+                    <a href="{% url 'articles:article-list' order_by=current_order page=article_list.paginator.num_pages %}{{ get_string }}">Laatste pagina</a>
+                    {% endif %}
+                </span>
+            </div>
         </div>
     </div>
 </div>
