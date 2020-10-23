@@ -78,7 +78,6 @@ class ArticleListView(generic.View):
         """Filtered list views"""
         context = {}
 
-
         if order_by == ORDER_TYPES[0]:
             """
             Order by newest first
@@ -143,7 +142,8 @@ class ArticleListView(generic.View):
         context["get_string"] = get_ext
         context["current_order"] = str(order_by)
 
-        # add all order_types to the context and highlight the currently selected
+        # add all order_types to the context and
+        # highlights the currently selected order type
         order_types = []
         for otype in ORDER_TYPES:
             if otype == context["current_order"]:
