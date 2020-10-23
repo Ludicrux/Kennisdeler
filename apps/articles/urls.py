@@ -26,6 +26,11 @@ urlpatterns = [
         name="article-favorite"
     ),
     path(
+        "kennis/<slug:slug>/like",
+        views.like_article,
+        name="article-like"
+    ),
+    path(
         "kennis/<slug:slug>/comment",
         views.create_comment,
         name="article-comment"

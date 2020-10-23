@@ -7,6 +7,15 @@
 {% block navbar %}
     <div class="navbar">
         <div class="navbaritems">
+            {% if user.is_authenticated %}
+                Ingelogd als: <b>{{ user.get_username }}
+                <a href="{% url 'logout' %}">Uitloggen </a>
+                <a href="{% url 'comments:comment-list' %}">Bedankjes</a>
+            {% else %}
+                <li><a href="{% url 'login' %}">Inloggen</a></li>
+            {% endif %}
+        </div>
+        <div class="navbaritems">
             <a href="{% url 'core:homepage' %}">Home</a>
             <a href="{% url 'articles:article-list' order_by='nieuw' page=1 %}">KennisBank</a>
             {% if user.is_authenticated %}
@@ -16,15 +25,6 @@
                 <input type="text" id="search" name="search"></input>
                 <button type="submit">Zoeken</button>
             </form>
-        </div>
-        <div class="navbaritems">
-            {% if user.is_authenticated %}
-                Ingelogd als: <b>{{ user.get_username }}
-                <a href="{% url 'logout' %}">Uitloggen </a>
-                <a href="{% url 'comments:comment-list' %}">Bedankjes</a>
-            {% else %}
-                <li><a href="{% url 'login' %}">Inloggen</a></li>
-            {% endif %}
         </div>
     </div>
 <br>

@@ -27,11 +27,6 @@ TIME_DELTA = 2      # days
 ORDER_TYPES = ["nieuw", "populair", "hot"]
 
 
-def redirect_to_list_view(order_by=ORDER_TYPES[0]):
-    """Redirect to newest first in article-list"""
-    return redirect("articles:article-list")
-
-
 @login_required
 def favorite_article(request, **kwargs):
     """favorite or unfavorite an article"""
@@ -40,6 +35,17 @@ def favorite_article(request, **kwargs):
         article.user_favorites.remove(request.user)
     else:
         article.user_favorites.add(request.user)
+    return redirect(article.get_absolute_url())
+
+
+@login_required
+def like_article(request, **kwargs):
+    """favorite or unfavorite an article"""
+    article = get_object_or_404(Article, slug=kwargs.get("slug"))
+    if request.user in article.user_likes.all():
+        article.user_likes.remove(request.user)
+    else:
+        article.user_likes.add(request.user)
     return redirect(article.get_absolute_url())
 
 
@@ -71,7 +77,7 @@ class ArticleListView(generic.View):
     def get(self, request, order_by=ORDER_TYPES[0], page=1, **kwargs):
         """Filtered list views"""
         context = {}
-        context["current_order"] = str(order_by)
+
 
         if order_by == ORDER_TYPES[0]:
             """
@@ -96,15 +102,10 @@ class ArticleListView(generic.View):
                 num_likes=Count("user_likes", filter=Q(created__gte=last_week))
             ).order_by("-num_likes")
 
-        # narrow filter to public only
         if request.user.is_authenticated:
             context["logged_in"] = True
-            context["article_count"] = Article.objects.all().count()
         else:
             article = article.filter(is_public=False)
-            context["article_count"] = Article.objects.filter(
-                is_public=False
-            ).count()
 
         if "favorite" in request.GET:
             context["favorite_selected"] = True
@@ -120,13 +121,7 @@ class ArticleListView(generic.View):
                 Q(long_desc__icontains=context["search_str"])
             )
 
-        url_path = request.get_full_path()
-        get_ext = ""
-        if "?" in url_path:
-            get_ext = url_path.split("?")[-1]
-            get_ext = f"?{get_ext}"
-        context["get_string"] = get_ext
-
+        # Apply filter over qs with the corresponding form
         article_filter = ArticleFilter(
             request.GET,
             queryset=article,
@@ -134,17 +129,27 @@ class ArticleListView(generic.View):
         )
         context["article_filter"] = article_filter
 
+        # Paginate filter qs
         paginator = Paginator(article_filter.qs, 6)
         article_list = paginator.get_page(page)
         context["article_list"] = article_list
 
+        # add a readable GET url string for linking to the context
+        url_path = request.get_full_path()
+        get_ext = ""
+        if "?" in url_path:
+            get_ext = url_path.split("?")[-1]
+            get_ext = f"?{get_ext}"
+        context["get_string"] = get_ext
+        context["current_order"] = str(order_by)
+
+        # add all order_types to the context and highlight the currently selected
         order_types = []
         for otype in ORDER_TYPES:
             if otype == context["current_order"]:
                 order_types.append({"name": otype, "current": "red"})
             else:
                 order_types.append({"name": otype, "current": ""})
-
         context["order_by"] = order_types
 
         return render(request, self.template_name, context)
@@ -180,6 +185,11 @@ class ArticleDetailView(generic.View):
             context["article_favorite"] = "Favorite"
         else:
             context["article_favorite"] = "Unfavorite"
+
+        if request.user in article.user_likes.all():
+            context["article_like"] = "Like"
+        else:
+            context["article_like"] = "Dislike"
 
         return render(request, self.template_name, context)
 
@@ -219,7 +229,7 @@ class ArticleEditView(generic.View):
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
 
         if not request.user == article.author:
-            return redirect_to_list_view()
+            return redirect(article.get_absolute_url())
 
         form = ArticleForm(instance=article)
         context = {
@@ -235,7 +245,7 @@ class ArticleEditView(generic.View):
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
 
         if not request.user == article.author:
-            return redirect_to_list_view()
+            return redirect(article.get_absolute_url())
 
         form = ArticleForm(
             request.POST or None,
