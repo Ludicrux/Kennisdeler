@@ -53,11 +53,21 @@
 
     <div class="col-side" id="right">
         <div class="content" style="background-color:beige; margin:2%;">
-            <div> 
-                {{ article.author }} 
-            </div>
-            <div>
-                {{ article.views }}X bekeken / {{ article.downloads }}X gedownload
+            <div style="width:100%; height:fit-content;">
+                <div style="width:100%; height:fit-content;">
+                    <div style="float:left; margin-right:5px;">
+                        <img src="{{ article.author.profile_picture.url }}"> 
+                    </div>
+                    <div style="float:left;">
+                        {{ article.author }} <br>
+                        {{ article.author.job }} - {{ article.author.organization }} ({{ user.article_count }} posts)
+                    </div>
+                </div>
+                <div style="width:100%;">
+                    <div>
+                        {{ article.views }}X bekeken / {{ article.downloads }}X gedownload
+                    <div>
+                </div>
             </div>
         </div>
         <div class="content" style="background-color:beige; height:20px; margin: 2%; height:20px;">

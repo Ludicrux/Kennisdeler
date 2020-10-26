@@ -8,7 +8,7 @@ from django.views import generic
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render, redirect
 # from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+from users.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.conf import settings

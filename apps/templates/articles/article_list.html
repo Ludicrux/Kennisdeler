@@ -45,13 +45,15 @@
             {% endif %}
             <div style="column: 2;">
             {% for article in article_list %}
-                <div class="kennisbank-qs-item" style="float: left; margin: 2%; padding:30px; width:40%; height:200px; background-color: rgb(241, 241, 213);">
-                    <!-- <img src="{{ article.image.url }}"> -->
+                <div class="kennisbank-qs-item" style="float: left; margin: 2%; padding:30px; width:40%; height:fit-content; background-color: rgb(241, 241, 213);">
+                    <img src="{{ article.image.url }}">
                     <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> 
                     {{ article.created|date}} {{ article.user_likes.count }} likes <br>
                     {{ article.short_desc }}<br>
-                    tags: {{ article.subject }} {{ article.level }} {{ arirticle.tags }} <br>
-                    by: {{ article.author }}
+                    {{ article.subject }} level: {{ article.level }} {{ arirticle.tags }} <br>
+                    <img src="{{ article.author.profile_picture.url }}"> 
+                    {{ article.author }} <br>
+                    {{ article.author.job }} - {{ article.author.organization }} ({{ user.article_count }} posts)
                 </div>
             {% empty %}
                 Geen kennis gevonden.
