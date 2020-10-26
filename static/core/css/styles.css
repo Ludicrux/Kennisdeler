@@ -97,7 +97,7 @@ body {
 .kennisbank-qs {
     margin: 20px;
     padding: 10px;
-    min-height: 80%
+    height: fit-content;
 }
 .kennisbank-qs-item {
     padding: 10px;
@@ -113,3 +113,17 @@ body {
     padding: 15px;
 }
 
+.homepage-block {
+    width:100%;
+    margin-bottom:100px;
+    min-height:15%;
+
+}
+
+.homepage-block h1 {
+    display: block;
+    font-size: 2em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}

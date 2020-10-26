@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin:50px; background-color:beige; height:500px;">
+    <div style="width:100%; padding:30px; ">
+        <h1>KENNIS IS GEDEELD!</h1>
+    </div>
+    <div style="float:right; margin:200px;">
+        <a style="font-size:2em;" href="{% url 'articles:article-detail' slug=slug %}"><b>Naar Kennis</b></a>
+    </div>
+    <div style="float:left; margin:200px;">
+        <a style="font-size:2em;" href="{% url 'articles:article-create' %}"><b>Meer delen</b></a>
+    </div>
+</div>
+{% endblock %}

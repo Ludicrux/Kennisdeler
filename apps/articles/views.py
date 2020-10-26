@@ -71,13 +71,11 @@ def create_comment(request, **kwargs):
 
 class ArticleListView(generic.View):
     """Generic list view for the Article model"""
-    model = Article
     template_name = "articles/article_list.html"
 
     def get(self, request, order_by=ORDER_TYPES[0], page=1, **kwargs):
         """Filtered list views"""
-        context = {}
-
+        # retrieve queryset depending on order_by
         if order_by == ORDER_TYPES[0]:
             """
             Order by newest first
@@ -101,23 +99,28 @@ class ArticleListView(generic.View):
                 num_likes=Count("user_likes", filter=Q(created__gte=last_week))
             ).order_by("-num_likes")
 
+        article_count = article.count()
+
+        logged_in = False
         if request.user.is_authenticated:
-            context["logged_in"] = True
+            logged_in = True
         else:
             article = article.filter(is_public=False)
 
+        favorite_selected = False
         if "favorite" in request.GET:
-            context["favorite_selected"] = True
+            favorite_selected = True
             article = article.filter(user_favorites=request.user)
 
         # filter on search
+        search_str = ""
         if "search" in request.GET:
-            context["search_str"] = request.GET["search"]
+            search_str = request.GET["search"]
             article = article.filter(
-                Q(title__icontains=context["search_str"]) |
-                Q(author__username__icontains=context["search_str"]) |
-                Q(short_desc__icontains=context["search_str"]) |
-                Q(long_desc__icontains=context["search_str"])
+                Q(title__icontains=search_str) |
+                Q(author__username__icontains=search_str) |
+                Q(short_desc__icontains=search_str) |
+                Q(long_desc__icontains=search_str)
             )
 
         # Apply filter over qs with the corresponding form
@@ -126,12 +129,9 @@ class ArticleListView(generic.View):
             queryset=article,
             request=request
         )
-        context["article_filter"] = article_filter
 
         # Paginate filter qs
-        paginator = Paginator(article_filter.qs, 6)
-        article_list = paginator.get_page(page)
-        context["article_list"] = article_list
+        article_list = Paginator(article_filter.qs, 6).get_page(page)
 
         # add a readable GET url string for linking to the context
         url_path = request.get_full_path()
@@ -139,18 +139,27 @@ class ArticleListView(generic.View):
         if "?" in url_path:
             get_ext = url_path.split("?")[-1]
             get_ext = f"?{get_ext}"
-        context["get_string"] = get_ext
-        context["current_order"] = str(order_by)
 
-        # add all order_types to the context and
+        # Add all order_types to the context and
         # highlights the currently selected order type
         order_types = []
         for otype in ORDER_TYPES:
-            if otype == context["current_order"]:
+            if otype == order_by:
                 order_types.append({"name": otype, "current": "red"})
             else:
                 order_types.append({"name": otype, "current": ""})
-        context["order_by"] = order_types
+
+        context = {
+            "article_filter": article_filter,
+            "article_list": article_list,
+            "get_string": get_ext,
+            "current_order": order_by,
+            "article_count": article_count,
+            "order_types": order_types,
+            "search_str": search_str,
+            "logged_in": logged_in,
+            "favorite_selected": favorite_selected,
+        }
 
         return render(request, self.template_name, context)
 
@@ -181,15 +190,13 @@ class ArticleDetailView(generic.View):
                 context["comment_form"] = commentform
 
         # Check if the user favorited the post
+        context["article_favorite"] = "Favorite"
         if request.user in article.user_favorites.all():
-            context["article_favorite"] = "Favorite"
-        else:
             context["article_favorite"] = "Unfavorite"
 
+        context["article_like"] = "like"
         if request.user in article.user_likes.all():
-            context["article_like"] = "Like"
-        else:
-            context["article_like"] = "Dislike"
+            context["article_like"] = "DisLike"
 
         return render(request, self.template_name, context)
 
@@ -203,7 +210,7 @@ class ArticleCreateView(SessionWizardView):
     )
 
     def done(self, form_list, **kwargs):
-        temp = []
+        temp = [] 
         for form in form_list:
             temp.append(form.cleaned_data)
         form_dict = temp[0]
@@ -212,7 +219,15 @@ class ArticleCreateView(SessionWizardView):
         article = Article(**form_dict)
         article.save()
 
-        return redirect(article.get_absolute_url())
+        context = {
+            "slug": article.slug,
+        }
+
+        return render(
+            self.request,
+            "articles/article_create_done.html",
+            context
+        )
 
 
 @method_decorator(login_required, name="dispatch")

@@ -154,4 +154,4 @@ TEMPLATES = [
     },
 ]
 
-LOGIN_REDIRECT_URL = '/kennisbank/nieuw'
+LOGIN_REDIRECT_URL = '/kennisbank/nieuw/pagina1/'

@@ -1,10 +1,36 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-<h1> OPLEIDINGEN </h1>
-<br>
-{% for subject in subject_list %}
-    <a href="{% url 'articles:article-list' order_by='nieuw' page=1 %}?subject={{subject.id}}"> {{ subject.name }}</a><br>
-    <img src="{{ subject.image.url }}"><br>
-{% endfor %}
+    <div class="container" style="background-color:beige; margin-left:50px;">
+        <div style="columns:4; padding:10px;">
+            <div class="homepage-block">
+                <h1> OPLEIDINGEN </h1>
+            </div>
+            {% for subject in subject_list %}
+                <div class="homepage-block">
+                    <a href="{% url 'articles:article-list' order_by='nieuw' page=1 %}?subject={{subject.id}}"><img src="{{ subject.image.url }}"></a>
+                    
+                </div>
+            {% endfor %}
+            <div class="homepage-block">
+                <h1> <a href="{% url 'articles:article-list' order_by='nieuw' page=1 %}">Kennisbank</h1></a>
+            </div>
+        </div>
+    </div>
+    <div style="height:50px;">
+    </div>
+    <div class="container" style="background-color:beige; margin-left:50px; height:300px;">
+        <div style="padding:30px;">
+            <h1>MEEST POPULAIRE ITEMS</h1>
+        </div>
+        {% for article in article_list %}
+            <div class="kennisbank-qs-item" style="float: left; margin: 2%; padding:30px;  width:25%; height:200px; background-color: rgb(241, 241, 213);">
+                <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> 
+                {{ article.created|date}} {{ article.user_likes.count }} likes <br>
+                {{ article.short_desc }}<br>
+                tags: {{ article.subject }} {{ article.level }} {{ arirticle.tags }} <br>
+                by: {{ article.author }}
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

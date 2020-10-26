@@ -32,7 +32,7 @@
         </div>
 
             <div class="sort">
-                {% for type in order_by %}
+                {% for type in order_types %}
                     <div class="orderby" style="background-color:{{type.current}};"> <a href="{% url 'articles:article-list' order_by=type.name page=article_list.number %}{{ get_string }}"> {{ type.name }}</a> </div>
                 {% endfor %}
             </div>
@@ -45,7 +45,7 @@
             {% endif %}
             <div style="column: 2;">
             {% for article in article_list %}
-                <div class="kennisbank-qs-item" style="float: left; width:45%; height:20%;">
+                <div class="kennisbank-qs-item" style="float: left; margin: 2%; padding:30px; width:40%; height:200px; background-color: rgb(241, 241, 213);">
                     <!-- <img src="{{ article.image.url }}"> -->
                     <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> 
                     {{ article.created|date}} {{ article.user_likes.count }} likes <br>
