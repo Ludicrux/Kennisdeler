@@ -8,7 +8,6 @@ from django.views import generic
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render, redirect
 # from django.contrib.auth import authenticate
-from users.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.conf import settings
@@ -19,6 +18,7 @@ from articles.models import Article
 from articles.filters import ArticleFilter
 from articles.forms import ArticleForm
 from comments.forms import CommentForm
+from users.models import User
 
 from formtools.wizard.views import SessionWizardView
 
@@ -57,6 +57,7 @@ def create_comment(request, **kwargs):
     form = CommentForm(request.POST)
     author = get_object_or_404(User, pk=request.user.id)
     article = get_object_or_404(Article, slug=kwargs.get("slug"))
+
     if request.user == article.author:
         return redirect(article.get_absolute_url())
 
@@ -118,7 +119,7 @@ class ArticleListView(generic.View):
             search_str = request.GET["search"]
             article = article.filter(
                 Q(title__icontains=search_str) |
-                Q(author__username__icontains=search_str) |
+                Q(author__first_name__icontains=search_str) |
                 Q(short_desc__icontains=search_str) |
                 Q(long_desc__icontains=search_str)
             )

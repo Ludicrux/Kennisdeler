@@ -13,6 +13,7 @@ urlpatterns = [
     path("", include("core.urls")),
     path("kennisbank/", include("articles.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("profiel/", include("users.urls")),
     # Send pathing through user profiles
     path("bedankjes/", include("comments.urls")),
 ]

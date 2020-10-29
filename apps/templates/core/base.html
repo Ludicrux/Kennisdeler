@@ -8,7 +8,7 @@
     <div class="navbar">
         <div class="navbaritems">
             {% if user.is_authenticated %}
-                Ingelogd als: <b>{{ user }}
+                Ingelogd als: <a href="{% url 'users:user-profile' %}">{{ user }}</a>
                 <a href="{% url 'logout' %}">Uitloggen </a>
                 <a href="{% url 'comments:comment-list' %}">Bedankjes</a>
             {% else %}

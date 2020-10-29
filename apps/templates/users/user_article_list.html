@@ -1,0 +1,9 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    {% for article in article_list %}
+        {{ article.title }} <br>
+    {% empty %}
+        Geen kennis gevonden.
+    {% endfor %}
+{% endblock %}

@@ -59,7 +59,7 @@
                         <img src="{{ article.author.profile_picture.url }}"> 
                     </div>
                     <div style="float:left;">
-                        {{ article.author }} <br>
+                        <a href="{{ article.author.get_absolute_url }}">{{ article.author }}</a> <br>
                         {{ article.author.job }} - {{ article.author.organization }} ({{ user.article_count }} posts)
                     </div>
                 </div>

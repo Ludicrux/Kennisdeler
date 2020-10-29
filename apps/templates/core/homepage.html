@@ -28,8 +28,8 @@
                 <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> 
                 {{ article.created|date}} {{ article.user_likes.count }} likes <br>
                 {{ article.short_desc }}<br>
-                tags: {{ article.subject }} {{ article.level }} {{ arirticle.tags }} <br>
-                by: {{ article.author }}
+                 {{ article.subject }} {{ article.level }} {{ arirticle.tags }} <br>
+                <a href="{{ article.author.get_absolute_url }}">{{ article.author }}</a>
             </div>
         {% endfor %}
     </div>
