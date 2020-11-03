@@ -1,8 +1,29 @@
 {% extends "core/base.html" %}
+{% load i18n %}
+
+{% block head %}
+    {{ wizard.form.media }}
+{% endblock %}
+
 {% block content %}
-    <form enctype="multipart/form-data" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Submit">
-    </form>
+<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+<form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
+<table>
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {{ form }}
+    {% endfor %}
+{% else %}
+    {{ wizard.form }}
+{% endif %}
+</table>
+{% if wizard.steps.prev %}
+    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "Terug" %}</button>
+    <input type="submit" value="{% trans "Opslaan" %}"/>
+{% else %}
+    <input type="submit" value="{% trans "Volgende" %}"/>
+{% endif %}
+</form>
 {% endblock %}

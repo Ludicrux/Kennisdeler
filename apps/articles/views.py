@@ -1,6 +1,7 @@
 """
 Views for Articles
 """
+from pathlib import Path
 from datetime import date, timedelta
 
 from django.views import generic
@@ -10,20 +11,20 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+from django.core.paginator import Paginator
 
 from articles.models import Article
 from articles.filters import ArticleFilter
 from articles.forms import ArticleForm
 from comments.forms import CommentForm
 
+from formtools.wizard.views import SessionWizardView
+
 
 TIME_DELTA = 2      # days
 ORDER_TYPES = ["nieuw", "populair", "hot"]
-
-
-def redirect_to_list_view(order_by=ORDER_TYPES[0]):
-    """Redirect to newest first in article-list"""
-    return redirect("articles:article-list", order_by)
 
 
 @login_required
@@ -34,6 +35,17 @@ def favorite_article(request, **kwargs):
         article.user_favorites.remove(request.user)
     else:
         article.user_favorites.add(request.user)
+    return redirect(article.get_absolute_url())
+
+
+@login_required
+def like_article(request, **kwargs):
+    """favorite or unfavorite an article"""
+    article = get_object_or_404(Article, slug=kwargs.get("slug"))
+    if request.user in article.user_likes.all():
+        article.user_likes.remove(request.user)
+    else:
+        article.user_likes.add(request.user)
     return redirect(article.get_absolute_url())
 
 
@@ -62,22 +74,17 @@ class ArticleListView(generic.View):
     model = Article
     template_name = "articles/article_list.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, order_by=ORDER_TYPES[0], page=1, **kwargs):
         """Filtered list views"""
-        article_count = Article.objects.filter(is_public=True).count()
-        context = {
-            "article_count": article_count
-        }
+        context = {}
 
-        order_type = self.kwargs["order_by"]
-
-        if order_type == ORDER_TYPES[0]:
+        if order_by == ORDER_TYPES[0]:
             """
             Order by newest first
             """
             article = Article.objects.all().order_by('-created')
 
-        elif order_type == ORDER_TYPES[1]:
+        elif order_by == ORDER_TYPES[1]:
             """
             Order by most likes all time
             """
@@ -85,7 +92,7 @@ class ArticleListView(generic.View):
                 num_likes=Count("user_likes")
             ).order_by("-num_likes")
 
-        elif order_type == ORDER_TYPES[2]:
+        elif order_by == ORDER_TYPES[2]:
             """
             Order by most likes over the TIME_DELTA in days
             """
@@ -94,25 +101,56 @@ class ArticleListView(generic.View):
                 num_likes=Count("user_likes", filter=Q(created__gte=last_week))
             ).order_by("-num_likes")
 
-        else:
-            return redirect_to_list_view()
-
-        # narrow filter to public only
-        article = article.filter(is_public=True)
-
         if request.user.is_authenticated:
             context["logged_in"] = True
+        else:
+            article = article.filter(is_public=False)
 
         if "favorite" in request.GET:
             context["favorite_selected"] = True
             article = article.filter(user_favorites=request.user)
 
+        # filter on search
+        if "search" in request.GET:
+            context["search_str"] = request.GET["search"]
+            article = article.filter(
+                Q(title__icontains=context["search_str"]) |
+                Q(author__username__icontains=context["search_str"]) |
+                Q(short_desc__icontains=context["search_str"]) |
+                Q(long_desc__icontains=context["search_str"])
+            )
+
+        # Apply filter over qs with the corresponding form
         article_filter = ArticleFilter(
             request.GET,
             queryset=article,
             request=request
         )
-        context["article_list"] = article_filter
+        context["article_filter"] = article_filter
+
+        # Paginate filter qs
+        paginator = Paginator(article_filter.qs, 6)
+        article_list = paginator.get_page(page)
+        context["article_list"] = article_list
+
+        # add a readable GET url string for linking to the context
+        url_path = request.get_full_path()
+        get_ext = ""
+        if "?" in url_path:
+            get_ext = url_path.split("?")[-1]
+            get_ext = f"?{get_ext}"
+        context["get_string"] = get_ext
+        context["current_order"] = str(order_by)
+
+        # add all order_types to the context and
+        # highlights the currently selected order type
+        order_types = []
+        for otype in ORDER_TYPES:
+            if otype == context["current_order"]:
+                order_types.append({"name": otype, "current": "red"})
+            else:
+                order_types.append({"name": otype, "current": ""})
+        context["order_by"] = order_types
 
         return render(request, self.template_name, context)
 
@@ -132,8 +170,6 @@ class ArticleDetailView(generic.View):
         }
 
         if not article.is_public:
-            if article.author != request.user:
-                return redirect_to_list_view()
             context["not_public"] = True
 
         # Check to see if the current user is the author of the article
@@ -146,42 +182,37 @@ class ArticleDetailView(generic.View):
 
         # Check if the user favorited the post
         if request.user in article.user_favorites.all():
-            context["article_favorite"] = request.user
+            context["article_favorite"] = "Favorite"
+        else:
+            context["article_favorite"] = "Unfavorite"
+
+        if request.user in article.user_likes.all():
+            context["article_like"] = "Like"
+        else:
+            context["article_like"] = "Dislike"
 
         return render(request, self.template_name, context)
 
 
 @method_decorator(login_required, name="dispatch")
-class ArticleCreateView(generic.View):
+class ArticleCreateView(SessionWizardView):
     """Creation view for Article"""
-    model = Article
     template_name = "articles/article_create.html"
+    file_storage = FileSystemStorage(
+        location=Path(settings.MEDIA_ROOT).joinpath('temp')
+    )
 
-    def get(self, request, *args, **kwargs):
-        """
-        Render the creation view for Article
-        """
-        form = ArticleForm()
-        context = {
-            "form": form
-        }
+    def done(self, form_list, **kwargs):
+        temp = []
+        for form in form_list:
+            temp.append(form.cleaned_data)
+        form_dict = temp[0]
+        form_dict.update(temp[1])
+        form_dict["author"] = get_object_or_404(User, pk=self.request.user.id)
+        article = Article(**form_dict)
+        article.save()
 
-        return render(request, self.template_name, context)
-
-    def post(self, request, *args, **kwargs):
-        """save the form to the Article model database"""
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            article = form.save(commit=False)
-            article.author = get_object_or_404(User, pk=request.user.id)
-            article.save()
-            return redirect(article.get_absolute_url())
-
-        context = {
-            "form": form
-        }
-
-        return render(request, self.template_name, context)
+        return redirect(article.get_absolute_url())
 
 
 @method_decorator(login_required, name="dispatch")
@@ -198,7 +229,7 @@ class ArticleEditView(generic.View):
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
 
         if not request.user == article.author:
-            return redirect_to_list_view()
+            return redirect(article.get_absolute_url())
 
         form = ArticleForm(instance=article)
         context = {
@@ -214,7 +245,7 @@ class ArticleEditView(generic.View):
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
 
         if not request.user == article.author:
-            return redirect_to_list_view()
+            return redirect(article.get_absolute_url())
 
         form = ArticleForm(
             request.POST or None,

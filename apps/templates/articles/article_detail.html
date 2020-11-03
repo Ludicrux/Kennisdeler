@@ -7,10 +7,11 @@
         <div class="edit">
             {% if article_author %}
                 <a href="{{ article.get_absolute_url_edit }}">Bewerk kennis</a>
+                {% if not_public %}
+                    Alleen zichtbaar voor leden op dit platform
+                {% endif %}
             {% endif %}
-            {% if not_public %}
-                KENNIS STAAT OP PRIVÉ
-            {% endif %}
+            
         </div>
         <div class="kennis-top">
             <div class="row">
@@ -20,13 +21,8 @@
                 {{ article.short_desc }} / {{ article.created|date }} <br>
             </div>
             <div class="row" id="right">
-             <!--Move to views -->
-                {% if article_favorite %}
-                    <a href="{% url 'articles:article-favorite' slug=article.slug %}">Unfavorite</a>
-                {% else %}
-                    <a href="{% url 'articles:article-favorite' slug=article.slug %}">Favorite</a>
-                {% endif %}
-                | Like
+                <a href="{% url 'articles:article-favorite' slug=article.slug %}">{{ article_favorite }}</a>
+                <a href="{% url 'articles:article-like' slug=article.slug %}">{{ article_like }}</a>
             </div>
         </div>
     </div>
@@ -64,22 +60,21 @@
                 {{ article.views }}X bekeken / {{ article.downloads }}X gedownload
             </div>
         </div>
-        <div class="content" style="columns:2">
-            <div style="float: left; background-color:beige; padding:5%;">
+        <div class="content" style="background-color:beige; height:20px; margin: 2%; height:20px;">
+            <div style="float: left; background-color:beige;">
                 DOWNLOADEN
             </div>
-            <div style="float: left; background-color:beige; padding:5%;">
+            <div style="float: right; background-color:beige;">
                 DELEN
             </div>
         </div>
-        <div class="content" style="background-color:beige; margin: 2%;">
-        <!--Move to views -->
-            {% if article_favorite %}
-                <a href="{% url 'articles:article-favorite' slug=article.slug %}">Unfavorite</a>
-            {% else %}
-                <a href="{% url 'articles:article-favorite' slug=article.slug %}">Favorite</a>
-            {% endif %}
-            LIKE
+        <div class="content" style="background-color:beige; margin: 2%; height:20px;">
+            <div style="float: left;">
+                <a href="{% url 'articles:article-favorite' slug=article.slug %}">{{ article_favorite }}</a>
+            </div>
+            <div style="float: right;">
+                <a href="{% url 'articles:article-like' slug=article.slug %}">{{ article_like }}</a>
+            </div>
         </div>
         <div class="content" style="background-color:beige; min-height:200px; margin: 2%;">
             {% if comment_form %}
@@ -91,9 +86,7 @@
             </form>
             {% endif %}
         </div>
-            <div>
-                Hier is iets niet in orde
-            </div>
+            REPORT
         </div>
     </div>
         <!-- VERGELIJKBAAR -->
