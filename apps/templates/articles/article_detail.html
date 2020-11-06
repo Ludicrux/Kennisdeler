@@ -58,9 +58,8 @@
                     <div style="float:left; margin-right:5px;">
                         <img src="{{ article.author.profile_picture.url }}"> 
                     </div>
-                    <div style="float:left;">
-                        <a href="{{ article.author.get_absolute_url }}">{{ article.author }}</a> <br>
-                        {{ article.author.job }} - {{ article.author.organization }} ({{ user.article_count }} posts)
+                    <div style="float:left;width:100%;">
+                        {% include 'core/profile.html' %}<br>
                     </div>
                 </div>
                 <div style="width:100%;">
@@ -70,7 +69,7 @@
                 </div>
             </div>
         </div>
-        <div class="content" style="background-color:beige; height:20px; margin: 2%; height:20px;">
+        <div class="content" style="background-color:beige; height:20px; margin-top: 10px; height:20px;">
             <div style="float: left; background-color:beige;">
                 DOWNLOADEN
             </div>
@@ -78,7 +77,7 @@
                 DELEN
             </div>
         </div>
-        <div class="content" style="background-color:beige; margin: 2%; height:20px;">
+        <div class="content" style="background-color:beige; margin-top: 10px; height:20px;">
             <div style="float: left;">
                 <a href="{% url 'articles:article-favorite' slug=article.slug %}">{{ article_favorite }}</a>
             </div>
@@ -86,7 +85,7 @@
                 <a href="{% url 'articles:article-like' slug=article.slug %}">{{ article_like }}</a>
             </div>
         </div>
-        <div class="content" style="background-color:beige; min-height:200px; margin: 2%;">
+        <div class="content" style="background-color:beige; min-height:200px; margin-top: 30px;">
             {% if comment_form %}
             STUUR EEN PERSOONLIJK BEDANKJE
             <form action="{% url 'articles:article-comment' slug=article.slug %}" method="post">

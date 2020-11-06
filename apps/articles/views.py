@@ -70,6 +70,78 @@ def create_comment(request, **kwargs):
     return redirect(article.get_absolute_url())
 
 
+def check_favorite_selected(article, request):
+    """check to see if favorite is selected"""
+    selected = False
+    if "favorite" in request.GET:
+        selected = True
+        article = article.filter(user_favorites=request.user)
+
+    return article, selected
+
+
+def get_article_order(order_by, article):
+    """Sort by selected order type"""
+    if order_by == ORDER_TYPES[0]:
+        """
+        Order by newest first
+        """
+        article = article.order_by('-created')
+
+    elif order_by == ORDER_TYPES[1]:
+        """
+        Order by most likes all time
+        """
+        article = article.annotate(
+            num_likes=Count("user_likes")
+        ).order_by("-num_likes")
+
+    elif order_by == ORDER_TYPES[2]:
+        """
+        Order by most likes over the TIME_DELTA in days
+        """
+        last_week = date.today() - timedelta(days=TIME_DELTA)
+        article = article.annotate(
+            num_likes=Count("user_likes", filter=Q(created__gte=last_week))
+        ).order_by("-num_likes")
+
+    return article
+
+
+def filter_public_articles(article, request):
+    """check to see if user is logged in, filter articles if not"""
+    logged_in = False
+    if request.user.is_authenticated:
+        logged_in = True
+    else:
+        article = article.filter(is_public=False)
+    return article, logged_in
+
+
+def filter_search(article, request):
+    """search using get string"""
+    search_str = ""
+    if "search" in request.GET:
+        search_str = request.GET["search"]
+        article = article.filter(
+            Q(title__icontains=search_str) |
+            Q(author__full_name__icontains=search_str) |
+            Q(short_desc__icontains=search_str) |
+            Q(long_desc__icontains=search_str)
+        )
+    return article, search_str
+
+
+def get_url_path_str(request):
+    """return get url path as string"""
+    url_path = request.get_full_path()
+    get_ext = ""
+    if "?" in url_path:
+        get_ext = url_path.split("?")[-1]
+        get_ext = f"?{get_ext}"
+    return get_ext
+
+
 class ArticleListView(generic.View):
     """Generic list view for the Article model"""
     template_name = "articles/article_list.html"
@@ -77,52 +149,13 @@ class ArticleListView(generic.View):
     def get(self, request, order_by=ORDER_TYPES[0], page=1, **kwargs):
         """Filtered list views"""
         # retrieve queryset depending on order_by
-        if order_by == ORDER_TYPES[0]:
-            """
-            Order by newest first
-            """
-            article = Article.objects.all().order_by('-created')
-
-        elif order_by == ORDER_TYPES[1]:
-            """
-            Order by most likes all time
-            """
-            article = Article.objects.annotate(
-                num_likes=Count("user_likes")
-            ).order_by("-num_likes")
-
-        elif order_by == ORDER_TYPES[2]:
-            """
-            Order by most likes over the TIME_DELTA in days
-            """
-            last_week = date.today() - timedelta(days=TIME_DELTA)
-            article = Article.objects.annotate(
-                num_likes=Count("user_likes", filter=Q(created__gte=last_week))
-            ).order_by("-num_likes")
-
+        article = get_article_order(order_by, Article.objects.all())
+        article, logged_in = filter_public_articles(article, request)
         article_count = article.count()
-
-        logged_in = False
-        if request.user.is_authenticated:
-            logged_in = True
-        else:
-            article = article.filter(is_public=False)
-
-        favorite_selected = False
-        if "favorite" in request.GET:
-            favorite_selected = True
-            article = article.filter(user_favorites=request.user)
+        article, favorite_selected = check_favorite_selected(article, request)
 
         # filter on search
-        search_str = ""
-        if "search" in request.GET:
-            search_str = request.GET["search"]
-            article = article.filter(
-                Q(title__icontains=search_str) |
-                Q(author__first_name__icontains=search_str) |
-                Q(short_desc__icontains=search_str) |
-                Q(long_desc__icontains=search_str)
-            )
+        article, search_str = filter_search(article, request)
 
         # Apply filter over qs with the corresponding form
         article_filter = ArticleFilter(
@@ -135,11 +168,7 @@ class ArticleListView(generic.View):
         article_list = Paginator(article_filter.qs, 6).get_page(page)
 
         # add a readable GET url string for linking to the context
-        url_path = request.get_full_path()
-        get_ext = ""
-        if "?" in url_path:
-            get_ext = url_path.split("?")[-1]
-            get_ext = f"?{get_ext}"
+        get_ext = get_url_path_str(request)
 
         # Add all order_types to the context and
         # highlights the currently selected order type
@@ -211,7 +240,7 @@ class ArticleCreateView(SessionWizardView):
     )
 
     def done(self, form_list, **kwargs):
-        temp = [] 
+        temp = []
         for form in form_list:
             temp.append(form.cleaned_data)
         form_dict = temp[0]

@@ -8,5 +8,7 @@
     Op jouw kennis: <a href="{{ comment.article.get_absolute_url }}">{{ comment.article }}</a><br>
     
     {{ comment.message }}<br><br>
+{% empty %}
+    Nog geen bedankjes ontvangen
 {% endfor %}
 {% endblock %}

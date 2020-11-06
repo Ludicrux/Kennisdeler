@@ -1,6 +1,16 @@
 {% extends "core/base.html" %}
 
 {% block content %}
+    {{ user.full_name }} <br>
+    {{ count.views }}X bekeken<br>
+    {{ count.likes }}X duimen gekregen<br>
+
+    {{ count.favorites}}X favoriet gemaakt<br>
+    {{ count.downloads }}X gedownload<br>
+
+    {{ count.article_count }} kennis toegevoegd <br>
+    <br>
+
     {% for article in article_list %}
         {{ article.title }} <br>
     {% empty %}

@@ -1,9 +1,35 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-    {% for article in article_list %}
-        {{ article.title }} <br>
-    {% empty %}
-        Geen kennis gevonden.
-    {% endfor %}
+    <div>
+        <img src="{{ user.profile.profile_picture.url }}">
+        <div style="">
+            {{ user.full_name }} <br>
+        </div>
+        <div style="">
+            {{ user.get_profile.job }}
+        </div>
+        <div style="">
+            {{ count.views }}X bekeken<br>
+        </div>
+        <div style="">
+            {{ count.likes }}X duimen gekregen<br>
+        </div>
+        <div style="">
+            {{ count.favorites}}X favoriet gemaakt<br>
+        </div>
+        <div style="">
+            {{ count.downloads }}X gedownload<br>
+        </div>
+        <div style="">
+            {{ article_count }} kennis toegevoegd <br>
+        </div>
+        <div style="">
+            {% for article in article_list %}
+                {{ article.title }} <br>
+            {% empty %}
+                Geen kennis gevonden.
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

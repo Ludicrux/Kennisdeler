@@ -51,9 +51,7 @@
                     {{ article.created|date}} {{ article.user_likes.count }} likes <br>
                     {{ article.short_desc }}<br>
                     {{ article.subject }} level: {{ article.level }} {{ arirticle.tags }} <br>
-                    <img src="{{ article.author.profile_picture.url }}"> 
-                    <a href="{{ article.author.get_absolute_url }}">{{ article.author }}</a> <br>
-                    {{ article.author.job }} - {{ article.author.organization }} ({{ user.article_count }} posts)
+                    {% include 'core/profile.html' %}
                 </div>
             {% empty %}
                 Geen kennis gevonden.

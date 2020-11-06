@@ -8,6 +8,7 @@
     <div class="navbar">
         <div class="navbaritems">
             {% if user.is_authenticated %}
+                <div style="float:right;"><img src="{{ user.get_profile.profile_picture.url }}"></div>
                 Ingelogd als: <a href="{% url 'users:user-profile' %}">{{ user }}</a>
                 <a href="{% url 'logout' %}">Uitloggen </a>
                 <a href="{% url 'comments:comment-list' %}">Bedankjes</a>

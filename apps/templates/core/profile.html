@@ -1,0 +1,7 @@
+{% block profile %}
+    <div style="margin-left:auto; margin-right:auto;">
+        <img src="{{ article.author.profile.profile_picture.url }}">
+        <a href="{{ article.author.get_absolute_url }}">{{ article.author }}</a> <br>
+        {{ article.author.profile.job }} - {{ article.author.profile.organization }} ({{ article.author.article_count }} posts)
+    </div>
+{% endblock %}

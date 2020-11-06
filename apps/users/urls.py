@@ -10,7 +10,7 @@ app_name = "users"
 urlpatterns = [
     path("", views.UserProfileView.as_view(), name="user-profile"),
     path(
-        "<slug:full_name>",
+        "<slug:slug>",
         views.UserArticleListView.as_view(),
         name="user-article-list"
     ),
