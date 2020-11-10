@@ -26,7 +26,7 @@
         </div>
         <div style="">
             {% for article in article_list %}
-                {{ article.title }} <br>
+                {% include "core/article_item.html" %}    
             {% empty %}
                 Geen kennis gevonden.
             {% endfor %}

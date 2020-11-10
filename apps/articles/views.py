@@ -51,9 +51,7 @@ def like_article(request, **kwargs):
 
 @login_required
 def create_comment(request, **kwargs):
-    """
-    User created comment
-    """
+    """User created comment"""
     form = CommentForm(request.POST)
     author = get_object_or_404(User, pk=request.user.id)
     article = get_object_or_404(Article, slug=kwargs.get("slug"))
@@ -71,7 +69,7 @@ def create_comment(request, **kwargs):
 
 
 def check_favorite_selected(article, request):
-    """check to see if favorite is selected"""
+    """Check to see if favorite is selected"""
     selected = False
     if "favorite" in request.GET:
         selected = True
@@ -83,23 +81,17 @@ def check_favorite_selected(article, request):
 def get_article_order(order_by, article):
     """Sort by selected order type"""
     if order_by == ORDER_TYPES[0]:
-        """
-        Order by newest first
-        """
+        """Order by newest first"""
         article = article.order_by('-created')
 
     elif order_by == ORDER_TYPES[1]:
-        """
-        Order by most likes all time
-        """
+        """Order by most likes all time"""
         article = article.annotate(
             num_likes=Count("user_likes")
         ).order_by("-num_likes")
 
     elif order_by == ORDER_TYPES[2]:
-        """
-        Order by most likes over the TIME_DELTA in days
-        """
+        """Order by most likes over the TIME_DELTA in days"""
         last_week = date.today() - timedelta(days=TIME_DELTA)
         article = article.annotate(
             num_likes=Count("user_likes", filter=Q(created__gte=last_week))
@@ -150,8 +142,9 @@ class ArticleListView(generic.View):
         """Filtered list views"""
         # retrieve queryset depending on order_by
         article = get_article_order(order_by, Article.objects.all())
-        article, logged_in = filter_public_articles(article, request)
         article_count = article.count()
+
+        article, logged_in = filter_public_articles(article, request)
         article, favorite_selected = check_favorite_selected(article, request)
 
         # filter on search
@@ -200,9 +193,7 @@ class ArticleDetailView(generic.View):
     template_name = "articles/article_detail.html"
 
     def get(self, request, *args, **kwargs):
-        """
-        Render the detail view for an object
-        """
+        """Render the detail view for an object"""
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
         context = {
             "article": article,
@@ -284,9 +275,7 @@ class ArticleEditView(generic.View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        """
-        Update the Article object with the new form details
-        """
+        """Update the Article object with the new form details"""
         article = get_object_or_404(Article, slug=kwargs.get("slug"))
 
         if not request.user == article.author:

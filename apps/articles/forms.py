@@ -9,6 +9,7 @@ from articles.models import Article, Subject
 
 
 class ArticleFormPage1(forms.ModelForm):
+    """First part of Article Creation form"""
     title = forms.CharField(label='Titel', max_length=120)
     short_desc = forms.CharField(label="Korte omschrijving", max_length=120)
     image = forms.ImageField(label="Upload afbeelding")
@@ -34,6 +35,7 @@ class ArticleFormPage1(forms.ModelForm):
 
 
 class ArticleFormPage2(forms.ModelForm):
+    """Second part of Article Creation form"""
     subject = forms.ModelChoiceField(
         label="Opleiding",
         queryset=Subject.objects.all(),
@@ -68,9 +70,7 @@ class ArticleFormPage2(forms.ModelForm):
 
 
 class ArticleForm(forms.ModelForm):
-    """
-    Create or update an article
-    """
+    """Article edit form"""
     class Meta:
         model = Article
         fields = [

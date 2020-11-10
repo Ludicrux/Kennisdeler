@@ -45,14 +45,7 @@
             {% endif %}
             <div style="column: 2;">
             {% for article in article_list %}
-                <div class="kennisbank-qs-item" style="float: left; margin: 2%; padding:30px; width:40%; height:fit-content; background-color: rgb(241, 241, 213);">
-                    <img src="{{ article.image.url }}">
-                    <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> 
-                    {{ article.created|date}} {{ article.user_likes.count }} likes <br>
-                    {{ article.short_desc }}<br>
-                    {{ article.subject }} level: {{ article.level }} {{ arirticle.tags }} <br>
-                    {% include 'core/profile.html' %}
-                </div>
+                {% include "core/article_item.html" %}          
             {% empty %}
                 Geen kennis gevonden.
             {% endfor %}

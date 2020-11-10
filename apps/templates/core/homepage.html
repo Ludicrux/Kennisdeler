@@ -8,12 +8,12 @@
             </div>
             {% for subject in subject_list %}
                 <div class="homepage-block">
-                    <a href="{% url 'articles:article-list' order_by='nieuw' page=1 %}?subject={{subject.id}}"><img src="{{ subject.image.url }}"></a>
+                    <a href="{% include 'core/article_listview_href.html' %}?subject={{subject.id}}"><img src="{{ subject.image.url }}"></a>
                     
                 </div>
             {% endfor %}
             <div class="homepage-block">
-                <h1> <a href="{% url 'articles:article-list' order_by='nieuw' page=1 %}">Kennisbank</h1></a>
+                <h1> <a href="{% include 'core/article_listview_href.html' %}">Kennisbank</h1></a>
             </div>
         </div>
     </div>
@@ -24,13 +24,7 @@
             <h1>MEEST POPULAIRE ITEMS</h1>
         </div>
         {% for article in article_list %}
-            <div class="kennisbank-qs-item" style="float: left; margin: 2%; padding:30px;  width:25%; height:200px; background-color: rgb(241, 241, 213);">
-                <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2> 
-                {{ article.created|date}} {{ article.user_likes.count }} likes <br>
-                {{ article.short_desc }}<br>
-                 {{ article.subject }} {{ article.level }} {{ arirticle.tags }} <br>
-                <a href="{{ article.author.get_absolute_url }}">{{ article.author }}</a>
-            </div>
+           {% include "core/article_item.html" %}    
         {% endfor %}
     </div>
 {% endblock %}

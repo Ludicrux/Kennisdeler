@@ -59,7 +59,7 @@
                         <img src="{{ article.author.profile_picture.url }}"> 
                     </div>
                     <div style="float:left;width:100%;">
-                        {% include 'core/profile.html' %}<br>
+                        {% include 'core/profile_snippet.html' %}<br>
                     </div>
                 </div>
                 <div style="width:100%;">
@@ -71,7 +71,9 @@
         </div>
         <div class="content" style="background-color:beige; height:20px; margin-top: 10px; height:20px;">
             <div style="float: left; background-color:beige;">
-                DOWNLOADEN
+                {% if article.uploaded_file %}
+                    <a href="{{ article.uploaded_file.url }}" download>DOWNLOAD</a>
+                {% endif %}
             </div>
             <div style="float: right; background-color:beige;">
                 DELEN
